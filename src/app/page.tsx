@@ -5,7 +5,6 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Hammer } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
-import me from "@/public/takshakmudgal.jpg";
 
 // Interface for mouse position
 interface MousePosition {
@@ -258,18 +257,6 @@ const Home: FC = () => {
                   onMouseLeave={() => setCursorVariant("default")}
                 >
                   @takshakmudgal
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                  >
-                    <Image
-                      src={me}
-                      alt="takshakmudgal"
-                      width={56}
-                      height={56}
-                      className="h-10 w-10 rounded-full sm:h-14 sm:w-14"
-                    />
-                  </motion.div>
                 </a>
               </motion.span>
             </motion.div>
