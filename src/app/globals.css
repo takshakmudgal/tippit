@@ -40,6 +40,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -72,7 +73,24 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px 5px rgba(62, 207, 142, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 25px 10px rgba(62, 207, 142, 0.3);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
 }
