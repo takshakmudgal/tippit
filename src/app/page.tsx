@@ -1,11 +1,13 @@
-import { Header } from "@/components/common/Header";
+import { Container } from "@/components/common/Container";
 
-const Home = () => {
+export default async function HomePage() {
   return (
-    <>
-      <Header />
-    </>
+    <main className="flex min-h-screen flex-col items-center justify-between">
+      <Container className="space-y-20">
+        <span className="font-semibold text-white text-4xl flex justify-center">
+          community tips, community projects
+        </span>
+      </Container>
+    </main>
   );
-};
-
-export default Home;
+}
