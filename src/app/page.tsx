@@ -4,25 +4,20 @@ import React, { useState, useEffect, useRef, FC } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Hammer } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import Image from "next/image";
 
-// Interface for mouse position
 interface MousePosition {
   x: number;
   y: number;
 }
 
-// Define possible cursor variants
 type CursorVariant = "default" | "text";
 
-// Props for GlowingCursor component
 interface GlowingCursorProps {
   mousePosition: MousePosition;
   cursorVariant: CursorVariant;
   isTouchDevice: boolean;
 }
 
-// Extend Navigator to include msMaxTouchPoints
 interface NavigatorWithMsMaxTouchPoints extends Navigator {
   msMaxTouchPoints?: number;
 }
@@ -80,7 +75,6 @@ const GlowingCursor: FC<GlowingCursorProps> = ({
   );
 };
 
-// Props for FloatingParticle component
 interface FloatingParticleProps {
   index: number;
 }
@@ -97,7 +91,6 @@ const FloatingParticle: FC<FloatingParticleProps> = ({ index }) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Initialize position after component mounts
     x.set(Math.random() * window.innerWidth);
     y.set(Math.random() * window.innerHeight);
 
@@ -138,7 +131,6 @@ const Home: FC = () => {
 
   const [cursorVariant, setCursorVariant] = useState<CursorVariant>("default");
 
-  // Detect if the device is touch-enabled
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
 
   useEffect(() => {
@@ -192,21 +184,15 @@ const Home: FC = () => {
           }}
         />
       )}
-
-      {/* Floating Particles */}
       {!isTouchDevice &&
         [...Array(20)].map((_, index) => (
           <FloatingParticle key={index} index={index} />
         ))}
-
-      {/* Glowing Cursor */}
       <GlowingCursor
         mousePosition={mousePosition}
         cursorVariant={cursorVariant}
         isTouchDevice={isTouchDevice}
       />
-
-      {/* Main Content */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         <motion.div
           style={{
