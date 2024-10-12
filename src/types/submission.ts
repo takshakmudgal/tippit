@@ -8,4 +8,5 @@ export interface Submission {
   user: {
     wallet: string;
   };
+  userWallet?: string;
 }
