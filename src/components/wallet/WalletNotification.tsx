@@ -20,7 +20,7 @@ export const WalletNotification: IUnifiedWalletConfig["notificationCallback"] =
           body: JSON.stringify({ wallet: props.publicKey }),
         });
         if (response.ok) {
-          const user = await response.json();
+          await response.json();
           toast.success(`Wallet Connected - ${props.shortAddress}`);
         } else {
           throw new Error("Failed to create/retrieve user");
