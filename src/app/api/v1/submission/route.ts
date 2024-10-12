@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Submission } from "@/types/submission";
 
 export async function POST(request: Request) {
   try {
@@ -64,7 +65,7 @@ export async function GET() {
     });
 
     return NextResponse.json(
-      submissions.map((sub) => ({
+      submissions.map((sub: Submission) => ({
         ...sub,
         userWallet: sub.user.wallet,
       }))
