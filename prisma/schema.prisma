@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id          String      @id @default(uuid())
+  wallet      String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  submissions Submission[]
+  tips        Tip[]
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  link        String
+  geolocation String
+  tipJarLimit Float    @default(200.0)
+  currentTips Float    @default(0.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tips        Tip[]
+}
+
+model Tip {
+  id                   String      @id @default(uuid())
+  submissionId         String
+  submission           Submission  @relation(fields: [submissionId], references: [id])
+  userId               String
+  user                 User        @relation(fields: [userId], references: [id])
+  amount               Float
+  currency             String      
+  transactionSignature String
+  createdAt            DateTime    @default(now())
+}

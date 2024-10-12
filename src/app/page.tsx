@@ -1,11 +1,13 @@
 import { Container } from "@/components/common/Container";
-import Submissions from "@/components/home/Submissions";
+import Submission from "@/components/home/Submission";
+import SubmissionList from "@/components/home/SubmissionList";
 
 export default function HomePage() {
   return (
     <main>
       <Container>
-        <Submissions />
+        <Submission />
+        <SubmissionList />
       </Container>
     </main>
   );

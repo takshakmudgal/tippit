@@ -1,0 +1,81 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { SOLANA_CONNECTION } from "@/utils/solana";
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { submissionId, userWallet, amount, currency, transactionSignature } =
+      body;
+
+    if (
+      !submissionId ||
+      !userWallet ||
+      !amount ||
+      !currency ||
+      !transactionSignature
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Verify the transaction
+    const transaction = await SOLANA_CONNECTION.getTransaction(
+      transactionSignature
+    );
+    if (!transaction) {
+      return NextResponse.json(
+        { error: "Invalid transaction" },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { wallet: userWallet },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const submission = await prisma.submission.findUnique({
+      where: { id: submissionId },
+    });
+
+    if (!submission) {
+      return NextResponse.json(
+        { error: "Submission not found" },
+        { status: 404 }
+      );
+    }
+
+    const newTip = await prisma.tip.create({
+      data: {
+        submissionId,
+        userId: user.id,
+        amount,
+        currency,
+        transactionSignature,
+      },
+    });
+
+    await prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        currentTips: {
+          increment: amount,
+        },
+      },
+    });
+
+    return NextResponse.json(newTip, { status: 201 });
+  } catch (error) {
+    console.error("Error creating tip:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

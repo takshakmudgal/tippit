@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Phrases } from "@/constants/submissions";
 
-export default function Submissions() {
+export default function Submission() {
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
