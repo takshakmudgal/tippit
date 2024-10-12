@@ -9,19 +9,21 @@ import { ToastNotification } from "@/components/common/ToastNotificationDisplay"
 import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 import { Submission } from "@/types/submission";
+import { Spinner } from "@/components/ui/spinner";
 
 const toast = new ToastNotification("submission-list");
 
 export default function SubmissionList() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [tipAmount, setTipAmount] = useState<number>(1);
   const [tippedSubmissions, setTippedSubmissions] = useState<Set<string>>(
     new Set()
   );
   const { publicKey, connected, signTransaction } = useWallet();
   const [solPrice, setSolPrice] = useState<number>(0);
   const [tipAmountUSD, setTipAmountUSD] = useState<number>(1);
-
+  const [tippingSubmissionId, setTippingSubmissionId] = useState<string | null>(
+    null
+  );
   useEffect(() => {
     fetchSubmissions();
     fetchSolPrice();
@@ -53,6 +55,8 @@ export default function SubmissionList() {
       return;
     }
 
+    setTippingSubmissionId(submission.id);
+
     try {
       if (!submission.userWallet) {
         throw new Error("Recipient wallet address is missing");
@@ -68,7 +72,7 @@ export default function SubmissionList() {
       }
 
       const balance = await getWalletBalance(publicKey);
-      const tipAmountSOL = Number((tipAmountUSD / solPrice).toFixed(9)); // Round to 9 decimal places
+      const tipAmountSOL = Number((tipAmountUSD / solPrice).toFixed(9));
       console.log(`Tipping ${tipAmountSOL} SOL (${tipAmountUSD} USD)`);
 
       if (balance < tipAmountSOL) {
@@ -120,6 +124,8 @@ export default function SubmissionList() {
           ? error.message
           : "Failed to send tip. Please try again."
       );
+    } finally {
+      setTippingSubmissionId(null);
     }
   };
 
@@ -161,14 +167,26 @@ export default function SubmissionList() {
                 <p className="mt-2">Tip Amount: ${tipAmountUSD.toFixed(2)}</p>
                 <Button
                   onClick={() => handleTip(submission)}
-                  disabled={!connected || isOwnSubmission || isTipped}
+                  disabled={
+                    !connected ||
+                    isOwnSubmission ||
+                    isTipped ||
+                    tippingSubmissionId === submission.id
+                  }
                   className="mt-2"
                 >
-                  {isTipped
-                    ? "Tipped!"
-                    : isOwnSubmission
-                    ? "Can't tip own submission"
-                    : "Send Tip"}
+                  {tippingSubmissionId === submission.id ? (
+                    <span className="flex items-center justify-center">
+                      <Spinner className="mr-2 h-4 w-4" />
+                      Tipping...
+                    </span>
+                  ) : isTipped ? (
+                    "Tipped!"
+                  ) : isOwnSubmission ? (
+                    "Can't tip own submission"
+                  ) : (
+                    "Send Tip"
+                  )}
                 </Button>
               </div>
             </CardContent>

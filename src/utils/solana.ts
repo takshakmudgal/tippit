@@ -17,11 +17,12 @@ export async function sendSolTip(
   amount: number,
   signTransaction: (transaction: Transaction) => Promise<Transaction>
 ) {
+  const lamports = Math.round(amount * LAMPORTS_PER_SOL);
   const transaction = new Transaction().add(
     SystemProgram.transfer({
       fromPubkey,
       toPubkey,
-      lamports: amount * LAMPORTS_PER_SOL,
+      lamports,
     })
   );
 
