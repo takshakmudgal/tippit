@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
-import { sendSolTip } from "@/utils/solana";
+import { sendSolTip, getWalletBalance } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 
 interface Submission {
@@ -65,6 +65,16 @@ export default function SubmissionList() {
       } catch (error) {
         console.error("Invalid recipient wallet address:", error);
         toast.error("Invalid recipient wallet address");
+        return;
+      }
+
+      const balance = await getWalletBalance(publicKey);
+      if (balance < tipAmount) {
+        toast.error(
+          `Insufficient balance. You have ${balance.toFixed(
+            2
+          )} SOL, but the tip requires ${tipAmount} SOL.`
+        );
         return;
       }
 

@@ -37,3 +37,8 @@ export async function sendSolTip(
 
   return signature;
 }
+
+export async function getWalletBalance(publicKey: PublicKey): Promise<number> {
+  const balance = await SOLANA_CONNECTION.getBalance(publicKey);
+  return balance / LAMPORTS_PER_SOL;
+}
