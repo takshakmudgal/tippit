@@ -1,9 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const Spinner: React.FC<SpinnerProps> = ({ className, ...props }) => {
+const Spinner: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => {
   return (
     <div
       className={cn(
