@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { SOLANA_CONNECTION } from "@/utils/solana";
+import { getSolPriceInUSD } from "@/utils/solana";
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +22,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify the transaction
     const transaction = await SOLANA_CONNECTION.getTransaction(
       transactionSignature
     );
@@ -51,12 +51,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const solPrice = await getSolPriceInUSD();
+    const amountUSD = amount * solPrice;
+
     const newTip = await prisma.tip.create({
       data: {
         submissionId,
         userId: user.id,
-        amount,
-        currency,
+        amount: amountUSD,
+        currency: "USD",
         transactionSignature,
       },
     });
@@ -65,7 +68,7 @@ export async function POST(request: Request) {
       where: { id: submissionId },
       data: {
         currentTips: {
-          increment: amount,
+          increment: amountUSD,
         },
       },
     });

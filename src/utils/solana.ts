@@ -17,11 +17,12 @@ export async function sendSolTip(
   amount: number,
   signTransaction: (transaction: Transaction) => Promise<Transaction>
 ) {
+  const lamports = Math.round(amount * LAMPORTS_PER_SOL);
   const transaction = new Transaction().add(
     SystemProgram.transfer({
       fromPubkey,
       toPubkey,
-      lamports: amount * LAMPORTS_PER_SOL,
+      lamports,
     })
   );
 
@@ -41,4 +42,15 @@ export async function sendSolTip(
 export async function getWalletBalance(publicKey: PublicKey): Promise<number> {
   const balance = await SOLANA_CONNECTION.getBalance(publicKey);
   return balance / LAMPORTS_PER_SOL;
+}
+
+export async function getSolPriceInUSD(): Promise<number> {
+  try {
+    const response = await fetch("https://price.jup.ag/v6/price?ids=SOL");
+    const data = await response.json();
+    return data.data.SOL.price;
+  } catch (error) {
+    console.error("Error fetching SOL price:", error);
+    return 0;
+  }
 }

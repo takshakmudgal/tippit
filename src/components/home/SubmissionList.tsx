@@ -6,31 +6,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
-import { sendSolTip, getWalletBalance } from "@/utils/solana";
+import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
-
-interface Submission {
-  id: string;
-  userId: string;
-  title: string;
-  link: string;
-  currentTips: number;
-  tipJarLimit: number;
-  userWallet: string;
-}
+import { Submission } from "@/types/submission";
+import { Spinner } from "@/components/ui/spinner";
 
 const toast = new ToastNotification("submission-list");
 
 export default function SubmissionList() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [tipAmount, setTipAmount] = useState<number>(1);
   const [tippedSubmissions, setTippedSubmissions] = useState<Set<string>>(
     new Set()
   );
   const { publicKey, connected, signTransaction } = useWallet();
-
+  const [solPrice, setSolPrice] = useState<number>(0);
+  const [tipAmountUSD, setTipAmountUSD] = useState<number>(1);
+  const [tippingSubmissionId, setTippingSubmissionId] = useState<string | null>(
+    null
+  );
   useEffect(() => {
     fetchSubmissions();
+    fetchSolPrice();
   }, []);
 
   const fetchSubmissions = async () => {
@@ -48,11 +44,18 @@ export default function SubmissionList() {
     }
   };
 
+  const fetchSolPrice = async () => {
+    const price = await getSolPriceInUSD();
+    setSolPrice(price);
+  };
+
   const handleTip = async (submission: Submission) => {
     if (!connected || !publicKey || !signTransaction) {
       toast.error("Please connect your wallet to tip");
       return;
     }
+
+    setTippingSubmissionId(submission.id);
 
     try {
       if (!submission.userWallet) {
@@ -69,11 +72,14 @@ export default function SubmissionList() {
       }
 
       const balance = await getWalletBalance(publicKey);
-      if (balance < tipAmount) {
+      const tipAmountSOL = Number((tipAmountUSD / solPrice).toFixed(9));
+      console.log(`Tipping ${tipAmountSOL} SOL (${tipAmountUSD} USD)`);
+
+      if (balance < tipAmountSOL) {
         toast.error(
           `Insufficient balance. You have ${balance.toFixed(
-            2
-          )} SOL, but the tip requires ${tipAmount} SOL.`
+            4
+          )} SOL, but the tip requires ${tipAmountSOL.toFixed(4)} SOL.`
         );
         return;
       }
@@ -81,7 +87,7 @@ export default function SubmissionList() {
       const signature = await sendSolTip(
         publicKey,
         recipientPubkey,
-        tipAmount,
+        tipAmountSOL,
         signTransaction
       );
 
@@ -93,16 +99,21 @@ export default function SubmissionList() {
         body: JSON.stringify({
           submissionId: submission.id,
           userWallet: publicKey.toString(),
-          amount: tipAmount,
+          amount: tipAmountSOL,
           currency: "SOL",
           transactionSignature: signature,
         }),
       });
 
       if (response.ok) {
-        toast.success(`Successfully tipped ${tipAmount} SOL`);
+        toast.success(
+          `Successfully tipped ${tipAmountSOL.toFixed(
+            4
+          )} SOL ($${tipAmountUSD.toFixed(2)})`
+        );
         setTippedSubmissions((prev) => new Set(prev).add(submission.id));
         fetchSubmissions();
+        fetchSolPrice();
       } else {
         throw new Error("Failed to record tip");
       }
@@ -113,6 +124,8 @@ export default function SubmissionList() {
           ? error.message
           : "Failed to send tip. Please try again."
       );
+    } finally {
+      setTippingSubmissionId(null);
     }
   };
 
@@ -141,27 +154,39 @@ export default function SubmissionList() {
                   {submission.link}
                 </a>
               </p>
-              <p>Current Tips: {submission.currentTips} SOL</p>
-              <p>Tip Jar Limit: {submission.tipJarLimit} SOL</p>
+              <p>Current Tips: ${submission.currentTips.toFixed(2)}</p>
+              <p>Tip Jar Limit: ${submission.tipJarLimit.toFixed(2)}</p>
               <div className="mt-4">
                 <Slider
                   min={0.1}
-                  max={10}
+                  max={200}
                   step={0.1}
-                  value={[tipAmount]}
-                  onValueChange={(value) => setTipAmount(value[0])}
+                  value={[tipAmountUSD]}
+                  onValueChange={(value) => setTipAmountUSD(value[0])}
                 />
-                <p className="mt-2">Tip Amount: {tipAmount} SOL</p>
+                <p className="mt-2">Tip Amount: ${tipAmountUSD.toFixed(2)}</p>
                 <Button
                   onClick={() => handleTip(submission)}
-                  disabled={!connected || isOwnSubmission || isTipped}
+                  disabled={
+                    !connected ||
+                    isOwnSubmission ||
+                    isTipped ||
+                    tippingSubmissionId === submission.id
+                  }
                   className="mt-2"
                 >
-                  {isTipped
-                    ? "Tipped!"
-                    : isOwnSubmission
-                    ? "Can't tip own submission"
-                    : "Send Tip"}
+                  {tippingSubmissionId === submission.id ? (
+                    <span className="flex items-center justify-center">
+                      <Spinner className="mr-2 h-4 w-4" />
+                      Tipping...
+                    </span>
+                  ) : isTipped ? (
+                    "Tipped!"
+                  ) : isOwnSubmission ? (
+                    "Can't tip own submission"
+                  ) : (
+                    "Send Tip"
+                  )}
                 </Button>
               </div>
             </CardContent>
