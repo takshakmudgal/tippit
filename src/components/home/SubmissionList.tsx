@@ -10,6 +10,7 @@ import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 import { Submission } from "@/types/submission";
 import { Spinner } from "@/components/ui/spinner";
+import { CircleFadingArrowUp } from "lucide-react";
 
 const toast = new ToastNotification("submission-list");
 
@@ -20,7 +21,7 @@ export default function SubmissionList() {
   );
   const { publicKey, connected, signTransaction } = useWallet();
   const [solPrice, setSolPrice] = useState<number>(0);
-  const [tipAmountUSD, setTipAmountUSD] = useState<number>(1);
+  const [tipAmountUSD, setTipAmountUSD] = useState<number>(5);
   const [tippingSubmissionId, setTippingSubmissionId] = useState<string | null>(
     null
   );
@@ -139,33 +140,54 @@ export default function SubmissionList() {
         const isTipped = tippedSubmissions.has(submission.id);
 
         return (
-          <Card key={submission.id}>
-            <CardHeader>
-              <CardTitle>{submission.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>
-                Link:{" "}
+          <Card key={submission.id} className="bg-transparent">
+            <CardHeader className="flex flex-row justify-between">
+              <span>
+                <CardTitle className="text-white">{submission.title}</CardTitle>
                 <a
                   href={submission.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-[#3ecf8e] underline underline-offset-2"
                 >
                   {submission.link}
                 </a>
+              </span>
+              <p className="text-white leading-5 text-center text-xs">
+                ${submission.currentTips.toFixed(2)}
+                <br />
+                Tipped!
               </p>
-              <p>Current Tips: ${submission.currentTips.toFixed(2)}</p>
-              <p>Tip Jar Limit: ${submission.tipJarLimit.toFixed(2)}</p>
+            </CardHeader>
+            <CardContent>
+              <p className="text-white text-sm">
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                Consequatur incidunt vero, velit, reprehenderit aut illo
+                dolorem, nulla voluptatibus harum ea praesentium! Unde id
+                doloribus eaque porro voluptatibus necessitatibus modi
+                distinctio!
+              </p>
+              {/* <p>Tip Jar Limit: ${submission.tipJarLimit.toFixed(2)}</p> */}
               <div className="mt-4">
-                <Slider
-                  min={0.1}
-                  max={200}
-                  step={0.1}
-                  value={[tipAmountUSD]}
-                  onValueChange={(value) => setTipAmountUSD(value[0])}
-                />
-                <p className="mt-2">Tip Amount: ${tipAmountUSD.toFixed(2)}</p>
+                <div className="flex flex-row text-white gap-2">
+                  $5
+                  <Slider
+                    min={5}
+                    max={50}
+                    step={5}
+                    value={[tipAmountUSD]}
+                    onValueChange={(value) => setTipAmountUSD(value[0])}
+                  />
+                  $50
+                </div>
+                <p className="mt-2 text-white">
+                  Tip Amount:{" "}
+                  <span className="text-[#3ecf8e]">
+                    ${tipAmountUSD.toFixed(2)}
+                  </span>
+                </p>
                 <Button
+                  variant={"tippit"}
                   onClick={() => handleTip(submission)}
                   disabled={
                     !connected ||
@@ -184,8 +206,13 @@ export default function SubmissionList() {
                     "Tipped!"
                   ) : isOwnSubmission ? (
                     "Can't tip own submission"
+                  ) : !connected ? (
+                    "Connect Wallet to Tip"
                   ) : (
-                    "Send Tip"
+                    <span className="flex items-center justify-center">
+                      Send Tip!
+                      <CircleFadingArrowUp className="ml-2 h-4 w-4 animate-fade" />
+                    </span>
                   )}
                 </Button>
               </div>

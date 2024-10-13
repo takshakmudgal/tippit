@@ -21,7 +21,7 @@ export default function Submission() {
 
   return (
     <div className="flex flex-col items-center justify-between">
-      <span className="font-semibold text-[#3ecf8e] text-xl sm:text-2xl md:text-3xl lg:text-4xl flex flex-col md:flex-row justify-center items-center text-center space-y-2 md:space-y-0 md:space-x-2">
+      <span className="leading-tight font-semibold text-[#3ecf8e] text-xl sm:text-2xl md:text-3xl lg:text-4xl flex flex-col md:flex-row justify-center items-center text-center space-y-2 md:space-y-0 md:space-x-2">
         <div>Fuel innovation & passion,</div>
         <div>
           by tipping{" "}
