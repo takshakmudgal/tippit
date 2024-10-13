@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useWallet } from "@jup-ag/wallet-adapter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,23 @@ export default function SubmissionList() {
   );
   const { publicKey, connected, signTransaction } = useWallet();
   const [solPrice, setSolPrice] = useState<number>(0);
-  const [tipAmountUSD, setTipAmountUSD] = useState<number>(5);
+  const [tipAmounts, setTipAmounts] = useState<{ [key: string]: number }>({});
   const [tippingSubmissionId, setTippingSubmissionId] = useState<string | null>(
     null
   );
+
   useEffect(() => {
     fetchSubmissions();
     fetchSolPrice();
   }, []);
+
+  useEffect(() => {
+    const initialTipAmounts = submissions.reduce((acc, submission) => {
+      acc[submission.id] = 5;
+      return acc;
+    }, {} as { [key: string]: number });
+    setTipAmounts(initialTipAmounts);
+  }, [submissions]);
 
   const fetchSubmissions = async () => {
     try {
@@ -73,6 +82,7 @@ export default function SubmissionList() {
       }
 
       const balance = await getWalletBalance(publicKey);
+      const tipAmountUSD = tipAmounts[submission.id];
       const tipAmountSOL = Number((tipAmountUSD / solPrice).toFixed(9));
       console.log(`Tipping ${tipAmountSOL} SOL (${tipAmountUSD} USD)`);
 
@@ -130,6 +140,10 @@ export default function SubmissionList() {
     }
   };
 
+  const handleSliderChange = (submissionId: string, value: number[]) => {
+    setTipAmounts((prev) => ({ ...prev, [submissionId]: value[0] }));
+  };
+
   return (
     <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 sm:max-w-2xl max-w-md justify-center sm:justify-start mx-auto sm:mx-0 md:border border-[#7272724f] rounded-3xl p-0 sm:p-6 mt-2 sm:mt-6">
       {submissions.map((submission) => {
@@ -138,6 +152,7 @@ export default function SubmissionList() {
           publicKey &&
           submission.userWallet === publicKey.toString();
         const isTipped = tippedSubmissions.has(submission.id);
+        const tipAmount = tipAmounts[submission.id] || 5;
 
         return (
           <Card key={submission.id} className="bg-transparent">
@@ -174,15 +189,17 @@ export default function SubmissionList() {
                     min={5}
                     max={50}
                     step={5}
-                    value={[tipAmountUSD]}
-                    onValueChange={(value) => setTipAmountUSD(value[0])}
+                    value={[tipAmount]}
+                    onValueChange={(value) =>
+                      handleSliderChange(submission.id, value)
+                    }
                   />
                   $50
                 </div>
                 <p className="mt-2 text-white">
                   Tip Amount:{" "}
                   <span className="text-[#3ecf8e]">
-                    ${tipAmountUSD.toFixed(2)}
+                    ${tipAmount.toFixed(2)}
                   </span>
                 </p>
                 <Button
