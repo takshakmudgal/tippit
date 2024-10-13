@@ -17,7 +17,7 @@ export const Header = () => {
   return (
     <Container>
       <header className="flex justify-center">
-        <div className="flex justify-between h-16 bg-[#121313] border border-[#3ecf8e33] rounded-full px-5 items-center w-[95vw] mt-4 animate-pulse-slow">
+        <div className="flex justify-between h-16 bg-[#121313] border border-[#3ecf8e33] rounded-full px-5 items-center w-[95vw] animate-pulse-slow">
           <Link
             href="/"
             className="text-white font-semibold text-2xl flex flex-row items-center gap-3 group"

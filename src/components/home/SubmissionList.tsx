@@ -131,7 +131,7 @@ export default function SubmissionList() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 sm:max-w-2xl max-w-md justify-center sm:justify-start mx-auto sm:mx-0 md:border border-[#7272724f] rounded-3xl p-0 sm:p-6 mt-2 sm:mt-6">
       {submissions.map((submission) => {
         const isOwnSubmission =
           connected &&
@@ -148,7 +148,7 @@ export default function SubmissionList() {
                   href={submission.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#3ecf8e] underline underline-offset-2"
+                  className="text-[#3ecf8e] underline underline-offset-2 text-xs"
                 >
                   {submission.link}
                 </a>
@@ -160,16 +160,15 @@ export default function SubmissionList() {
               </p>
             </CardHeader>
             <CardContent>
-              <p className="text-white text-sm">
+              <p className="text-white text-xs sm:text-sm text-balance leading-tight">
                 Lorem ipsum dolor sit amet consectetur, adipisicing elit.
                 Consequatur incidunt vero, velit, reprehenderit aut illo
                 dolorem, nulla voluptatibus harum ea praesentium! Unde id
                 doloribus eaque porro voluptatibus necessitatibus modi
                 distinctio!
               </p>
-              {/* <p>Tip Jar Limit: ${submission.tipJarLimit.toFixed(2)}</p> */}
               <div className="mt-4">
-                <div className="flex flex-row text-white gap-2">
+                <div className="flex flex-row text-white gap-1 sm:gap-2">
                   $5
                   <Slider
                     min={5}
@@ -209,7 +208,7 @@ export default function SubmissionList() {
                   ) : !connected ? (
                     "Connect Wallet to Tip"
                   ) : (
-                    <span className="flex items-center justify-center">
+                    <span className="flex items-center justify-center ">
                       Send Tip!
                       <CircleFadingArrowUp className="ml-2 h-4 w-4 animate-fade" />
                     </span>
