@@ -5,8 +5,7 @@ import { FloatingParticle } from "../FloatingParticle";
 import { GlowingCursor } from "../Cursor";
 import { Card } from "../ui/card";
 import { Hammer } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CursorVariant, MousePosition } from "@/app/types/cursor";
 
 export const Progress = () => {
