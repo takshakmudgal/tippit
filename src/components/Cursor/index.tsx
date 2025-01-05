@@ -5,10 +5,7 @@ import { motion } from "framer-motion";
 export const GlowingCursor: FC<GlowingCursorProps> = ({
   mousePosition,
   cursorVariant,
-  isTouchDevice,
 }) => {
-  if (isTouchDevice) return null;
-
   const spring = {
     type: "spring",
     stiffness: 500,
