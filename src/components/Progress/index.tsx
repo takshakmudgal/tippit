@@ -25,19 +25,7 @@ export const Progress = () => {
 
   const [cursorVariant, setCursorVariant] = useState<CursorVariant>("default");
 
-  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
-
   useEffect(() => {
-    const touchDevice =
-      "ontouchstart" in window ||
-      navigator.maxTouchPoints > 0 ||
-      ((navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints ?? 0) > 0;
-    setIsTouchDevice(touchDevice);
-  }, []);
-
-  useEffect(() => {
-    if (isTouchDevice) return;
-
     const handleMouseMove = (e: MouseEvent) => {
       const rect = ref.current?.getBoundingClientRect();
       if (rect) {
@@ -52,18 +40,16 @@ export const Progress = () => {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [isTouchDevice]);
+  }, []);
 
   useEffect(() => {
-    if (isTouchDevice) return;
-
     mouseX.set(mousePosition.x);
     mouseY.set(mousePosition.y);
-  }, [mousePosition, mouseX, mouseY, isTouchDevice]);
+  }, [mousePosition, mouseX, mouseY]);
 
   return (
     <div className="text-white" ref={ref}>
-      {!isTouchDevice && (
+      {
         <motion.div
           className="absolute inset-0"
           style={{
@@ -74,15 +60,13 @@ export const Progress = () => {
             y: moveY,
           }}
         />
-      )}
-      {!isTouchDevice &&
-        [...Array(20)].map((_, index) => (
-          <FloatingParticle key={index} index={index} />
-        ))}
+      }
+      {[...Array(20)].map((_, index) => (
+        <FloatingParticle key={index} index={index} />
+      ))}
       <GlowingCursor
         mousePosition={mousePosition}
         cursorVariant={cursorVariant}
-        isTouchDevice={isTouchDevice}
       />
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         <motion.div

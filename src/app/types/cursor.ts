@@ -8,7 +8,6 @@ export type CursorVariant = "default" | "text";
 export interface GlowingCursorProps {
   mousePosition: MousePosition;
   cursorVariant: CursorVariant;
-  isTouchDevice: boolean;
 }
 
 export interface NavigatorWithMsMaxTouchPoints extends Navigator {
