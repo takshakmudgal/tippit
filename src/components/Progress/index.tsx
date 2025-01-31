@@ -8,6 +8,7 @@ import { Hammer } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CursorVariant, MousePosition } from "@/app/types/cursor";
 
+// indicates the progress of the project
 export const Progress = () => {
   const ref = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
