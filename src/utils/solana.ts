@@ -46,9 +46,11 @@ export async function getWalletBalance(publicKey: PublicKey): Promise<number> {
 
 export async function getSolPriceInUSD(): Promise<number> {
   try {
-    const response = await fetch("https://price.jup.ag/v6/price?ids=SOL");
+    const response = await fetch(
+      "https://api.jup.ag/price/v2?ids=So11111111111111111111111111111111111111112"
+    );
     const data = await response.json();
-    return data.data.SOL.price;
+    return data.data.So11111111111111111111111111111111111111112.price;
   } catch (error) {
     console.error("Error fetching SOL price:", error);
     return 0;

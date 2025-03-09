@@ -25,7 +25,7 @@ export default function Submission() {
     <Container>
       <div className="flex flex-col items-center justify-between">
         <span className="leading-tight font-semibold text-[#3ecf8e] text-lg sm:text-2xl lg:text-3xl flex flex-col md:flex-row justify-center items-center text-center text-nowrap">
-          <span>Fuel innovation & passion,</span>
+          <span>Fuel innovation & passion,&nbsp;</span>
           <span>
             by tipping{" "}
             <span
@@ -33,9 +33,8 @@ export default function Submission() {
                 isVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              {Phrases[currentPhraseIndex]}
+              {Phrases[currentPhraseIndex]}.
             </span>
-            .
           </span>
         </span>
       </div>

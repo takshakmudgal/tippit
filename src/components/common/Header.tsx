@@ -1,19 +1,10 @@
 "use client";
 import { Container } from "./Container";
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wallet } from "lucide-react";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
 
 export const Header = () => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <Container>
       <header className="flex justify-center">
