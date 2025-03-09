@@ -23,6 +23,7 @@ model Submission {
   title       String
   link        String
   geolocation String
+  description String
   tipJarLimit Float    @default(200.0)
   currentTips Float    @default(0.0)
   createdAt   DateTime @default(now())
