@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { SOLANA_CONNECTION } from "@/utils/solana";
 import { getSolPriceInUSD } from "@/utils/solana";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { submissionId, userWallet, amount, currency, transactionSignature } =
@@ -80,5 +80,27 @@ export async function POST(request: Request) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const query = searchParams.get("submissionId");
+
+  if (!query)
+    return NextResponse.json(
+      { Error: "Please provide the query params || Invalid submissionId" },
+      { status: 400 }
+    );
+
+  try {
+    const result = await prisma.submission.findMany({
+      where: {
+        id: query,
+      },
+    });
+    return NextResponse.json(result[0].tipJarLimit);
+  } catch (error) {
+    return NextResponse.error();
   }
 }
