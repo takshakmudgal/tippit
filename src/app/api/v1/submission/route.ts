@@ -51,6 +51,7 @@ export async function GET() {
         userId: true,
         title: true,
         link: true,
+        description: true,
         currentTips: true,
         tipJarLimit: true,
         user: {

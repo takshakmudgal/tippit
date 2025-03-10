@@ -41,10 +41,10 @@ export default function Submission() {
       </div>
 
       <div className="flex flex-col lg:flex-row w-full gap-6">
-        <div className="lg:w-3/4">
+        <div className="w-full lg:w-3/4">
           <SubmissionList />
         </div>
-        <div className="lg:w-1/4 hidden lg:block">
+        <div className="hidden lg:block lg:w-1/4">
           {/* Future component will go here */}
         </div>
       </div>

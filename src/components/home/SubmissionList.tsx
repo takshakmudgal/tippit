@@ -9,7 +9,7 @@ import { ToastNotification } from "@/components/common/ToastNotificationDisplay"
 import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 import { Submission } from "@/types/submission";
-import { Spinner } from "@heroui/react";
+import { Spinner, Pagination } from "@heroui/react";
 import { CircleFadingArrowUp } from "lucide-react";
 
 const toast = new ToastNotification("submission-list");
@@ -27,10 +27,31 @@ export default function SubmissionList() {
     null
   );
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSmallScreen, setIsSmallScreen] = useState(true);
+  const itemsPerPage = {
+    sm: 3,
+    lg: 6,
+  };
+
   useEffect(() => {
     fetchSubmissions();
     fetchSolPrice();
+
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 1024);
+    };
+
+    checkScreenSize();
+
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [isSmallScreen]);
 
   useEffect(() => {
     const initialTipAmounts = submissions.reduce((acc, submission) => {
@@ -148,41 +169,54 @@ export default function SubmissionList() {
     setTipAmounts((prev) => ({ ...prev, [submissionId]: value[0] }));
   };
 
+  const getPaginatedSubmissions = () => {
+    const perPage = isSmallScreen ? itemsPerPage.sm : itemsPerPage.lg;
+    const totalPages = Math.ceil(submissions.length / perPage);
+
+    const startIndex = (currentPage - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, submissions.length);
+
+    return {
+      items: submissions.slice(startIndex, endIndex),
+      totalPages,
+    };
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    document
+      .querySelector(".submissions-container")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   if (loading) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-8 sm:py-16">
-        {/* Mobile view - just spinner without text */}
         <div className="sm:hidden flex items-center justify-center">
           <Spinner
             classNames={{ label: "text-foreground mt-4" }}
-            // label="spinner"
             variant="spinner"
             color="success"
             size="lg"
           />
         </div>
 
-        {/* Desktop view - loading text and skeleton cards */}
         <div className="hidden sm:block w-full">
-          {/* Loading text with dots animation */}
-          <div className="text-white text-2xl mb-10 text-center flex gap-2">
+          <div className="text-white text-2xl mb-10 text-center flex gap-2 items-center justify-center">
             <Spinner
               classNames={{ label: "text-foreground mt-4" }}
-              // label="spinner"
               variant="spinner"
               color="success"
             />
             Loading submissions, please wait.
           </div>
 
-          {/* Skeleton cards - reduced to 3 */}
-          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full opacity-30">
+          <div className="grid gap-5 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 w-full opacity-30">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-80 rounded-xl bg-gray-800 overflow-hidden p-4 animate-pulse flex flex-col"
+                className="w-full h-auto rounded-xl bg-gray-800 overflow-hidden p-4 animate-pulse flex flex-col border border-[#7272724f] shadow-md"
               >
-                {/* Card header with title and link */}
                 <div className="flex flex-row justify-between mb-4">
                   <div className="flex-1">
                     <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
@@ -190,16 +224,12 @@ export default function SubmissionList() {
                   </div>
                   <div className="w-16 h-10 bg-gray-700 rounded ml-2"></div>
                 </div>
-
-                {/* Card description */}
-                <div className="space-y-2 mb-auto">
+                <div className="space-y-2 mb-4 w-full pr-0">
                   <div className="h-3 bg-gray-700 rounded w-full"></div>
                   <div className="h-3 bg-gray-700 rounded w-full"></div>
                   <div className="h-3 bg-gray-700 rounded w-4/5"></div>
-                  <div className="h-3 bg-gray-700 rounded w-3/4"></div>
                 </div>
 
-                {/* Slider section */}
                 <div className="mt-auto">
                   <div className="flex flex-row items-center mb-2">
                     <div className="w-5 h-4 bg-gray-700 rounded mr-2"></div>
@@ -209,7 +239,6 @@ export default function SubmissionList() {
 
                   <div className="h-4 bg-gray-700 rounded w-32 mb-3"></div>
 
-                  {/* Button */}
                   <div className="h-9 bg-[#3ecf8e30] rounded-md w-full sm:w-36"></div>
                 </div>
               </div>
@@ -221,9 +250,33 @@ export default function SubmissionList() {
   }
 
   return (
-    <div className="w-full mx-auto md:border border-[#7272724f] rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8">
-      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full">
-        {submissions.map((submission) => {
+    <div className="w-full mx-auto md:border border-[#7272724f] rounded-3xl p-4 sm:p-5 md:p-6 lg:p-8 submissions-container">
+      {submissions.length >
+        (isSmallScreen ? itemsPerPage.sm : itemsPerPage.lg) && (
+        <div className="mb-4 flex flex-col items-center justify-center">
+          <p className="text-gray-400 text-sm mb-2">
+            Showing {getPaginatedSubmissions().items.length} of{" "}
+            {submissions.length} submissions
+          </p>
+          <Pagination
+            loop
+            showControls
+            color="success"
+            initialPage={1}
+            page={currentPage}
+            total={getPaginatedSubmissions().totalPages}
+            onChange={handlePageChange}
+            classNames={{
+              wrapper: "gap-2",
+              item: "text-white bg-transparent",
+              cursor: "bg-[#3ecf8e] text-black",
+            }}
+          />
+        </div>
+      )}
+
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 w-full">
+        {getPaginatedSubmissions().items.map((submission) => {
           const isOwnSubmission =
             connected &&
             publicKey &&
@@ -234,18 +287,18 @@ export default function SubmissionList() {
           return (
             <Card
               key={submission.id}
-              className="bg-transparent h-full flex flex-col"
+              className="bg-transparent h-auto w-full flex flex-col border-[#7272724f] shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <CardHeader className="flex flex-row justify-between pb-2">
+              <CardHeader className="flex flex-row justify-between pb-2 p-3 sm:p-4">
                 <div className="overflow-hidden mr-2 flex-1">
-                  <CardTitle className="text-white text-sm xs:text-base md:text-lg break-words hyphens-auto">
+                  <CardTitle className="text-white text-sm xs:text-base md:text-lg break-words hyphens-auto line-clamp-1">
                     {submission.title}
                   </CardTitle>
                   <a
                     href={submission.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#3ecf8e] underline underline-offset-2 text-xs break-all hyphens-auto"
+                    className="text-[#3ecf8e] underline underline-offset-2 text-xs break-all hyphens-auto line-clamp-1"
                   >
                     {submission.link}
                   </a>
@@ -256,15 +309,11 @@ export default function SubmissionList() {
                   Tipped!
                 </p>
               </CardHeader>
-              <CardContent className="flex-grow flex flex-col">
-                <p className="text-white text-xs sm:text-sm text-balance leading-tight mb-auto">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Consequatur incidunt vero, velit, reprehenderit aut illo
-                  dolorem, nulla voluptatibus harum ea praesentium! Unde id
-                  doloribus eaque porro voluptatibus necessitatibus modi
-                  distinctio!
+              <CardContent className="flex-grow flex flex-col p-3 sm:p-4 pt-0">
+                <p className="text-white text-xs sm:text-sm leading-tight mb-4 line-clamp-3 w-full pr-0">
+                  {submission.description}
                 </p>
-                <div className="mt-4">
+                <div className="mt-auto">
                   <div className="flex flex-row text-white gap-1 sm:gap-2 items-center">
                     <span className="text-xs sm:text-sm">$5</span>
                     <Slider
@@ -279,7 +328,7 @@ export default function SubmissionList() {
                     />
                     <span className="text-xs sm:text-sm">$50</span>
                   </div>
-                  <p className="mt-2 text-white text-sm">
+                  <p className="mt-2 mb-2 text-white text-sm">
                     Tip Amount:{" "}
                     <span className="text-[#3ecf8e]">
                       ${tipAmount.toFixed(2)}
@@ -300,7 +349,6 @@ export default function SubmissionList() {
                       <span className="flex items-center justify-center">
                         <Spinner
                           classNames={{ label: "text-foreground mt-4" }}
-                          // label="spinner"
                           variant="spinner"
                           color="success"
                         />

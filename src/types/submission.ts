@@ -3,6 +3,7 @@ export interface Submission {
   userId: string;
   title: string;
   link: string;
+  description: string;
   currentTips: number;
   tipJarLimit: number;
   user: {
