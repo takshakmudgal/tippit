@@ -165,13 +165,14 @@ export default function SubmissionList() {
         {/* Desktop view - loading text and skeleton cards */}
         <div className="hidden sm:block w-full">
           {/* Loading text with dots animation */}
-          <div className="text-[#3ecf8e] text-2xl font-medium mb-10 text-center flex">
-            Loading submissions, please wait
+          <div className="text-white text-2xl mb-10 text-center flex gap-2">
             <Spinner
               classNames={{ label: "text-foreground mt-4" }}
-              variant="dots"
+              // label="spinner"
+              variant="spinner"
               color="success"
             />
+            Loading submissions, please wait.
           </div>
 
           {/* Skeleton cards - reduced to 3 */}
