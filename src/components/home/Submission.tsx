@@ -23,22 +23,31 @@ export default function Submission() {
 
   return (
     <Container>
-      <div className="flex flex-col items-center justify-between">
-        <span className="leading-tight font-semibold text-[#3ecf8e] text-lg sm:text-2xl lg:text-3xl flex flex-col md:flex-row justify-center items-center text-center text-nowrap">
-          <span>Fuel innovation & passion,&nbsp;</span>
-          <span>
+      <div className="w-full text-center pt-3 pb-2 sm:pt-0 sm:-mt-2 md:-mt-8 lg:-mt-12 md:mb-6">
+        <h1 className="inline-block text-[#3ecf8e] font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl px-2 m-0">
+          Fuel innovation & passion,
+          <br className="hidden sm:block" />
+          <span className="sm:mt-0 inline-block">
             by tipping{" "}
             <span
-              className={`inline-block transition-opacity duration-500 ${
+              className={`transition-opacity duration-500 ${
                 isVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               {Phrases[currentPhraseIndex]}.
             </span>
           </span>
-        </span>
+        </h1>
       </div>
-      <SubmissionList />
+
+      <div className="flex flex-col lg:flex-row w-full gap-6">
+        <div className="lg:w-3/4">
+          <SubmissionList />
+        </div>
+        <div className="lg:w-1/4 hidden lg:block">
+          {/* Future component will go here */}
+        </div>
+      </div>
     </Container>
   );
 }

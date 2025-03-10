@@ -2,8 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  box-sizing: border-box;
+  background-color: #121313;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
 }
 
 @layer utilities {
@@ -93,4 +104,75 @@ body {
 
 .animate-pulse-slow {
   animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Sequential ellipsis animation */
+@keyframes ellipsis1 {
+
+  0%,
+  20%,
+  100% {
+    opacity: 0;
+  }
+
+  30%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis2 {
+
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+
+  40%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis3 {
+
+  0%,
+  40%,
+  100% {
+    opacity: 0;
+  }
+
+  50%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis4 {
+
+  0%,
+  50%,
+  100% {
+    opacity: 0;
+  }
+
+  60%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis5 {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+
+  70%,
+  90% {
+    opacity: 1;
+  }
 }

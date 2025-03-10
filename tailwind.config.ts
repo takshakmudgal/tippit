@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import { heroui } from "@heroui/react";
+import { nextui } from "@nextui-org/react";
 
 const config: Config = {
   darkMode: ["class"],
@@ -6,8 +8,18 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@nextui-org/react/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      xs: "375px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       colors: {
         background: "hsl(var(--background))",
@@ -58,6 +70,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), heroui(), nextui()],
 };
 export default config;

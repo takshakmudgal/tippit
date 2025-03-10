@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { wallet, title, link, geolocation } = body;
+    const { wallet, title, link, geolocation, description } = body;
 
-    if (!wallet || !title || !link || !geolocation) {
+    if (!wallet || !title || !link || !geolocation || !description) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         title,
         link,
         geolocation,
+        description,
       },
     });
 

@@ -3,7 +3,7 @@ import Submission from "@/components/home/Submission";
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="flex-1 bg-[#121313] w-full">
       <Container>
         <Submission />
       </Container>
