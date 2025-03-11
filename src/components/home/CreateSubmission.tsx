@@ -15,6 +15,11 @@ import { Spinner } from "@heroui/react";
 import { PlusCircle, MapPin } from "lucide-react";
 import Autocomplete from "react-google-autocomplete";
 import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
+import { createSubmissionSchema } from "@/schemas/submission";
+import {
+  validateForm,
+  formatApiValidationErrors,
+} from "@/utils/form-validation";
 
 const toast = new ToastNotification("create-submission");
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
@@ -36,6 +41,7 @@ export default function CreateSubmission() {
       lng: 0,
     },
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -45,42 +51,97 @@ export default function CreateSubmission() {
       ...prev,
       [name]: value,
     }));
+
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const clearLocationErrors = () => {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors["location"];
+      delete newErrors["location.placeId"];
+      delete newErrors["location.formattedAddress"];
+      delete newErrors["geolocation"];
+      delete newErrors["geolocation.placeId"];
+      delete newErrors["geolocation.formattedAddress"];
+      delete newErrors["geolocation.lat"];
+      delete newErrors["geolocation.lng"];
+      return newErrors;
+    });
   };
 
   const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
-    if (place && place.geometry && place.geometry.location) {
-      setFormData((prev) => ({
-        ...prev,
-        location: {
-          placeId: place.place_id || "",
-          formattedAddress: place.formatted_address || "",
-          lat: place.geometry!.location.lat() || 0,
-          lng: place.geometry!.location.lng() || 0,
-        },
-      }));
+    if (
+      !place ||
+      !place.place_id ||
+      !place.formatted_address ||
+      !place.geometry ||
+      !place.geometry.location
+    ) {
+      toast.error(
+        "Invalid location data. Please try selecting a different location."
+      );
+      return;
     }
+
+    const location = {
+      placeId: place.place_id,
+      formattedAddress: place.formatted_address,
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      location,
+    }));
+
+    clearLocationErrors();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!connected || !publicKey) {
-      toast.error("Please connect your wallet to submit a project");
+      toast.error("Please connect your wallet first");
       return;
     }
 
-    if (!formData.title.trim()) {
-      toast.error("Title is required");
+    if (!formData.location.placeId || !formData.location.formattedAddress) {
+      setErrors({
+        "geolocation.placeId": "Place ID is required",
+        "geolocation.formattedAddress": "Address is required",
+      });
+      toast.error("Please select a location");
       return;
     }
 
-    if (!formData.link.trim()) {
-      toast.error("Link is required");
-      return;
-    }
+    const locationData = {
+      placeId: formData.location.placeId,
+      formattedAddress: formData.location.formattedAddress,
+      lat: formData.location.lat,
+      lng: formData.location.lng,
+    };
 
-    if (!formData.description.trim()) {
-      toast.error("Description is required");
+    const submissionData = {
+      wallet: publicKey.toString(),
+      title: formData.title,
+      link: formData.link,
+      description: formData.description,
+      geolocation: locationData,
+      tipJarLimit: parseInt(formData.tipJarLimit.toString(), 10),
+    };
+
+    const validation = validateForm(createSubmissionSchema, submissionData);
+    if (!validation.success) {
+      console.error("Form validation failed:", validation.errors);
+      setErrors(validation.errors || {});
       return;
     }
 
@@ -92,43 +153,45 @@ export default function CreateSubmission() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          wallet: publicKey.toString(),
-          title: formData.title,
-          link: formData.link,
-          description: formData.description,
-          geolocation: formData.location,
-          tipJarLimit: formData.tipJarLimit,
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        toast.success("Submission created successfully!");
-        setFormData({
-          title: "",
-          link: "",
-          description: "",
-          tipJarLimit: 100,
-          location: {
-            placeId: "",
-            formattedAddress: "",
-            lat: 0,
-            lng: 0,
-          },
-        });
-      } else {
-        const errorMessage = data.error || "Failed to create submission";
-        throw new Error(errorMessage);
+      if (!response.ok) {
+        if (data.error && typeof data.error === "object") {
+          console.error("API validation errors:", data.error);
+          const apiErrors = formatApiValidationErrors(data);
+          setErrors(apiErrors);
+          toast.error("Please fix the errors in the form");
+        } else {
+          console.error(
+            "API error:",
+            data.error || "Failed to create submission"
+          );
+          toast.error(data.error || "Failed to create submission");
+        }
+        setIsSubmitting(false);
+        return;
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to create submission. Please try again.";
 
-      toast.error(errorMessage);
+      toast.success("Submission created successfully!");
+      setFormData({
+        title: "",
+        link: "",
+        description: "",
+        tipJarLimit: 100,
+        location: {
+          placeId: "",
+          formattedAddress: "",
+          lat: 0,
+          lng: 0,
+        },
+      });
+      setErrors({});
+    } catch (error) {
+      console.error("Submission creation error:", error);
+      toast.error("An error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -137,7 +200,13 @@ export default function CreateSubmission() {
   const renderLocationInput = () => {
     if (scriptLoading) {
       return (
-        <div className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-gray-500 flex items-center justify-center">
+        <div
+          className={`w-full p-2 rounded-md bg-[#232424] border ${
+            errors["geolocation.placeId"] || errors["geolocation"]
+              ? "border-red-500"
+              : "border-[#7272724f]"
+          } text-gray-500 flex items-center justify-center`}
+        >
           <Spinner size="sm" className="mr-2" /> Loading map service...
         </div>
       );
@@ -145,7 +214,13 @@ export default function CreateSubmission() {
 
     if (!scriptLoaded) {
       return (
-        <div className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-gray-500 flex items-center justify-center">
+        <div
+          className={`w-full p-2 rounded-md bg-[#232424] border ${
+            errors["geolocation.placeId"] || errors["geolocation"]
+              ? "border-red-500"
+              : "border-[#7272724f]"
+          } text-gray-500 flex items-center justify-center`}
+        >
           Failed to load map service. Please refresh the page.
         </div>
       );
@@ -154,19 +229,21 @@ export default function CreateSubmission() {
     return (
       <Autocomplete
         onPlaceSelected={handlePlaceSelected}
-        placeholder="Search for a location..."
-        className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]"
+        placeholder="Search for a location (required)..."
+        className={`w-full p-2 rounded-md bg-[#232424] border ${
+          errors["geolocation.placeId"] ||
+          errors["geolocation"] ||
+          errors["location.placeId"]
+            ? "border-red-500"
+            : "border-[#7272724f]"
+        } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]`}
         options={{
-          types: ["(cities)"],
-          fields: [
-            "address_components",
-            "formatted_address",
-            "geometry",
-            "place_id",
-          ],
+          types: ["establishment", "geocode"],
+          fields: ["place_id", "formatted_address", "geometry"],
           componentRestrictions: { country: [] },
           strictBounds: false,
         }}
+        apiKey={GOOGLE_MAPS_API_KEY}
       />
     );
   };
@@ -180,7 +257,11 @@ export default function CreateSubmission() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          id="submission-form"
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm text-gray-200">
               Title
@@ -192,9 +273,14 @@ export default function CreateSubmission() {
               value={formData.title}
               onChange={handleInputChange}
               placeholder="What's your project about?"
-              className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]"
+              className={`w-full p-2 rounded-md bg-[#232424] border ${
+                errors.title ? "border-red-500" : "border-gray-300"
+              } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]`}
               maxLength={100}
             />
+            {errors.title && (
+              <p className="text-xs text-red-500">{errors.title}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -208,8 +294,13 @@ export default function CreateSubmission() {
               value={formData.link}
               onChange={handleInputChange}
               placeholder="URL to your project"
-              className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]"
+              className={`w-full p-2 rounded-md bg-[#232424] border ${
+                errors.link ? "border-red-500" : "border-gray-300"
+              } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]`}
             />
+            {errors.link && (
+              <p className="text-xs text-red-500">{errors.link}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -218,7 +309,7 @@ export default function CreateSubmission() {
               className="text-sm text-gray-200 flex items-center gap-1"
             >
               <MapPin size={14} />
-              Location
+              Location <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               {renderLocationInput()}
@@ -227,7 +318,25 @@ export default function CreateSubmission() {
                   Selected: {formData.location.formattedAddress}
                 </div>
               )}
+              {!formData.location.formattedAddress && (
+                <div className="mt-2 text-xs text-gray-400">
+                  Please search and select a location from the dropdown
+                </div>
+              )}
             </div>
+            {errors["location.placeId"] && (
+              <p className="text-xs text-red-500">
+                {errors["location.placeId"]}
+              </p>
+            )}
+            {errors["geolocation.placeId"] && (
+              <p className="text-xs text-red-500">
+                {errors["geolocation.placeId"]}
+              </p>
+            )}
+            {errors["geolocation"] && (
+              <p className="text-xs text-red-500">{errors["geolocation"]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -240,9 +349,14 @@ export default function CreateSubmission() {
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Describe your project..."
-              className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e] min-h-[80px]"
+              className={`w-full p-2 rounded-md bg-[#232424] border ${
+                errors.description ? "border-red-500" : "border-gray-300"
+              } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e] min-h-[80px]`}
               maxLength={300}
             />
+            {errors.description && (
+              <p className="text-xs text-red-500">{errors.description}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -257,14 +371,26 @@ export default function CreateSubmission() {
               onChange={handleInputChange}
               min={1}
               max={10000}
-              className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]"
+              className={`w-full p-2 rounded-md bg-[#232424] border ${
+                errors.tipJarLimit ? "border-red-500" : "border-gray-300"
+              } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]`}
             />
+            {errors.tipJarLimit && (
+              <p className="text-xs text-red-500">{errors.tipJarLimit}</p>
+            )}
           </div>
+
+          {errors._form && (
+            <div className="rounded-md bg-red-50 p-3">
+              <p className="text-sm text-red-500">{errors._form}</p>
+            </div>
+          )}
         </form>
       </CardContent>
       <CardFooter>
         <Button
-          onClick={handleSubmit}
+          type="submit"
+          form="submission-form"
           disabled={isSubmitting || !connected}
           className="w-full bg-[#3ecf8e] hover:bg-[#35b57c] text-black font-medium py-2 px-4 rounded-md transition-colors duration-200"
         >

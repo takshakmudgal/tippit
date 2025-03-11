@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createSubmissionSchema } from "@/schemas/submission";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { wallet, title, link, geolocation, description, tipJarLimit } = body;
 
-    if (!wallet || !title || !link || !geolocation || !description) {
+    const validationResult = createSubmissionSchema.safeParse(body);
+
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: validationResult.error.format() },
         { status: 400 }
       );
     }
+
+    const { wallet, title, link, geolocation, description, tipJarLimit } =
+      validationResult.data;
 
     let user = await prisma.user.findUnique({
       where: { wallet },
@@ -47,7 +52,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(newSubmission, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("Error creating submission:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -96,7 +102,8 @@ export async function GET() {
         };
       })
     );
-  } catch {
+  } catch (error) {
+    console.error("Error retrieving submissions:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

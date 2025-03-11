@@ -282,7 +282,6 @@ export default function SubmissionList() {
                     {submission.link}
                   </a>
 
-                  {/* Show geolocation right below the link */}
                   {submission.geolocation && (
                     <div className="mt-1 flex items-start">
                       <div className="text-xs text-gray-400 flex gap-1 items-start">
@@ -381,7 +380,6 @@ export default function SubmissionList() {
         })}
       </div>
 
-      {/* Pagination at the bottom left */}
       {submissions.length > 0 && (
         <div className="mt-4 flex flex-row items-center justify-start">
           <div className="text-gray-400 text-xs mr-3">
@@ -405,17 +403,23 @@ export default function SubmissionList() {
         </div>
       )}
 
-      {/* Submission Details Modal */}
       {selectedSubmission && (
         <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-[#121212] border border-[#7272724f] rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-3 border-b border-[#7272724f]">
+            <div className="p-3 border-b border-[#7272724f] flex justify-between items-center">
               <h3 className="text-base sm:text-lg font-semibold text-white">
                 {selectedSubmission.title}
               </h3>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedSubmission(null)}
+                className="text-xs"
+                size="sm"
+              >
+                Close
+              </Button>
             </div>
             <div className="p-3 space-y-3">
-              {/* Link */}
               <div>
                 <h4 className="text-xs sm:text-sm text-gray-400 mb-1">Link</h4>
                 <div className="flex items-center">
@@ -431,7 +435,6 @@ export default function SubmissionList() {
                 </div>
               </div>
 
-              {/* Location */}
               {selectedSubmission.geolocation && (
                 <div>
                   <h4 className="text-xs sm:text-sm text-gray-400 mb-1">
@@ -451,7 +454,6 @@ export default function SubmissionList() {
                 </div>
               )}
 
-              {/* Description */}
               <div>
                 <h4 className="text-xs sm:text-sm text-gray-400 mb-1">
                   Description
@@ -461,7 +463,6 @@ export default function SubmissionList() {
                 </p>
               </div>
 
-              {/* Tipping Info */}
               <div>
                 <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                   <div>
@@ -479,7 +480,6 @@ export default function SubmissionList() {
                 </div>
               </div>
 
-              {/* User Info */}
               <div>
                 <div className="text-xs text-gray-300 break-all">
                   <span className="text-gray-400">Wallet:</span>{" "}
@@ -487,16 +487,6 @@ export default function SubmissionList() {
                     selectedSubmission.user.wallet}
                 </div>
               </div>
-            </div>
-            <div className="p-3 border-t border-[#7272724f] flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setSelectedSubmission(null)}
-                className="text-xs"
-                size="sm"
-              >
-                Close
-              </Button>
             </div>
           </div>
         </div>

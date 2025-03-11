@@ -26,8 +26,8 @@ export const WalletNotification: IUnifiedWalletConfig["notificationCallback"] =
           throw new Error("Failed to create/retrieve user");
         }
       } catch (error) {
-        console.error("Error creating/retrieving user:", error);
-        toast.error("Failed to initialize user. Please try again.");
+        console.error("Wallet connection error:", error);
+        toast.error("Failed to connect wallet");
       }
     },
     onConnecting: (props: IWalletNotification) => {
