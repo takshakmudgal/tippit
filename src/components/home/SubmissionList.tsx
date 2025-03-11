@@ -404,7 +404,14 @@ export default function SubmissionList() {
       )}
 
       {selectedSubmission && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300"
+          style={{
+            backdropFilter: "blur(4px)",
+            transition:
+              "backdrop-filter 500ms ease-in-out 150ms, background-color 300ms ease-in-out",
+          }}
+        >
           <div className="bg-[#121212] border border-[#7272724f] rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-3 border-b border-[#7272724f] flex justify-between items-center">
               <h3 className="text-base sm:text-lg font-semibold text-white">
