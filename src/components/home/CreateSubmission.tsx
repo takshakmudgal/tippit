@@ -22,7 +22,8 @@ const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 export default function CreateSubmission() {
   const { publicKey, connected } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading: scriptLoading } = useGoogleMapsScript(GOOGLE_MAPS_API_KEY);
+  const { loading: scriptLoading, loaded: scriptLoaded } =
+    useGoogleMapsScript(GOOGLE_MAPS_API_KEY);
   const [formData, setFormData] = useState({
     title: "",
     link: "",
@@ -142,6 +143,14 @@ export default function CreateSubmission() {
       );
     }
 
+    if (!scriptLoaded) {
+      return (
+        <div className="w-full p-2 rounded-md bg-[#232424] border border-[#7272724f] text-gray-500 flex items-center justify-center">
+          Failed to load map service. Please refresh the page.
+        </div>
+      );
+    }
+
     return (
       <Autocomplete
         onPlaceSelected={handlePlaceSelected}
@@ -158,7 +167,6 @@ export default function CreateSubmission() {
           componentRestrictions: { country: [] },
           strictBounds: false,
         }}
-        apiKey={GOOGLE_MAPS_API_KEY}
       />
     );
   };
