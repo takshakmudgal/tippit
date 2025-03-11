@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { wallet, title, link, geolocation, description } = body;
+    const { wallet, title, link, geolocation, description, tipJarLimit } = body;
 
     if (!wallet || !title || !link || !geolocation || !description) {
       return NextResponse.json(
@@ -23,19 +23,31 @@ export async function POST(request: Request) {
       });
     }
 
+    let geoString;
+    if (typeof geolocation === "string") {
+      try {
+        const parsed = JSON.parse(geolocation);
+        geoString = JSON.stringify(parsed);
+      } catch {
+        geoString = geolocation;
+      }
+    } else {
+      geoString = JSON.stringify(geolocation);
+    }
+
     const newSubmission = await prisma.submission.create({
       data: {
         userId: user.id,
         title,
         link,
-        geolocation,
+        geolocation: geoString,
         description,
+        ...(tipJarLimit && { tipJarLimit: parseFloat(String(tipJarLimit)) }),
       },
     });
 
     return NextResponse.json(newSubmission, { status: 201 });
-  } catch (error) {
-    console.error("Error creating submission:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -52,6 +64,7 @@ export async function GET() {
         title: true,
         link: true,
         description: true,
+        geolocation: true,
         currentTips: true,
         tipJarLimit: true,
         user: {
@@ -66,13 +79,24 @@ export async function GET() {
     });
 
     return NextResponse.json(
-      submissions.map((sub) => ({
-        ...sub,
-        userWallet: sub.user.wallet,
-      }))
+      submissions.map((sub) => {
+        let parsedGeolocation = sub.geolocation;
+        if (typeof sub.geolocation === "string") {
+          try {
+            parsedGeolocation = JSON.parse(sub.geolocation);
+          } catch {
+            parsedGeolocation = sub.geolocation;
+          }
+        }
+
+        return {
+          ...sub,
+          userWallet: sub.user.wallet,
+          geolocation: parsedGeolocation,
+        };
+      })
     );
-  } catch (error) {
-    console.error("Error fetching submissions:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

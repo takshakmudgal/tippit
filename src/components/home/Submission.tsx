@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Phrases } from "@/constants/submissions";
 import SubmissionList from "./SubmissionList";
+import CreateSubmission from "./CreateSubmission";
 import { Container } from "../common/Container";
 
 export default function Submission() {
@@ -44,8 +45,8 @@ export default function Submission() {
         <div className="w-full lg:w-3/4">
           <SubmissionList />
         </div>
-        <div className="hidden lg:block lg:w-1/4">
-          {/* Future component will go here */}
+        <div className="w-full lg:w-1/4 mt-6 lg:mt-0">
+          <CreateSubmission />
         </div>
       </div>
     </Container>

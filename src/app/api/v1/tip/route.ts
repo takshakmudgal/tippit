@@ -101,6 +101,6 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(result[0].tipJarLimit);
   } catch (error) {
-    return NextResponse.error();
+    return console.error("Error fetching tip jar limit:", error);
   }
 }

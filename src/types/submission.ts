@@ -10,4 +10,10 @@ export interface Submission {
     wallet: string;
   };
   userWallet?: string;
+  geolocation?: {
+    placeId: string;
+    formattedAddress: string;
+    lat: number;
+    lng: number;
+  };
 }

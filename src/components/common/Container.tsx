@@ -6,12 +6,12 @@ export function Container({ children, className, ...props }: ContainerProps) {
   return (
     <section
       className={cn(
-        "w-full max-w-full mx-auto px-3 sm:px-5 md:px-8 lg:px-12 py-2 sm:py-4 md:py-6 bg-[#121313]",
+        "w-full max-w-[1500px] mx-auto px-2 sm:px-3 md:px-4 py-2 sm:py-4 md:py-6 bg-[#121313] flex justify-center",
         className
       )}
       {...props}
     >
-      {children}
+      <div className="w-full">{children}</div>
     </section>
   );
 }
