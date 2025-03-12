@@ -1,8 +1,8 @@
 "use client";
 import { Container } from "./Container";
 import Link from "next/link";
-import { Wallet } from "lucide-react";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
+import Image from "next/image";
 
 export const Header = () => {
   return (
@@ -11,15 +11,15 @@ export const Header = () => {
         <div className="flex justify-between h-16 bg-[#121313] border border-[#3ecf8e33] rounded-full px-5 items-center w-[95vw] animate-pulse-slow">
           <Link
             href="/"
-            className="text-white font-semibold text-2xl flex flex-row items-center gap-3 group"
+            className="text-white font-semibold text-2xl flex flex-row items-center gap-1 group"
           >
             <div className="relative">
-              <Wallet
-                size={32}
-                color="#3ecf8e"
-                strokeWidth={0.75}
-                absoluteStrokeWidth
-                className="transition-all duration-700 group-hover:scale-110 group-hover:rotate-12"
+              <Image
+                src="/tippit-logo.png"
+                alt="tippit"
+                width={40}
+                height={40}
+                className="transition-all duration-700 group-hover:scale-125 group-hover:rotate-12"
               />
               <div className="absolute inset-0 bg-[#3ecf8e33] rounded-full blur-md scale-125 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>

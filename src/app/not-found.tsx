@@ -1,17 +1,18 @@
 import Link from "next/link";
-import { ArrowLeft, Wallet } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
       <div className="relative mb-6">
         <div className="absolute inset-0 bg-[#3ecf8e20] rounded-full blur-xl scale-[2.5] "></div>
-        <Wallet
-          size={64}
-          color="#3ecf8e"
-          strokeWidth={0.75}
-          absoluteStrokeWidth
-          className="relative z-10"
+        <Image
+          src="/tippit-logo.png"
+          alt="tippit"
+          width={80}
+          height={80}
+          className="transition-all duration-700 group-hover:scale-125 group-hover:rotate-12"
         />
       </div>
 

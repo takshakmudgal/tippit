@@ -24,21 +24,26 @@ export default function Submission() {
 
   return (
     <Container>
-      <div className="w-full text-center pt-3 pb-2 sm:pt-0 sm:-mt-2 md:-mt-8 lg:-mt-12 md:mb-6">
-        <h1 className="inline-block text-[#3ecf8e] font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl px-2 m-0">
-          Fuel innovation & passion,
-          <br className="hidden sm:block" />
-          <span className="sm:mt-0 inline-block">
-            by tipping{" "}
-            <span
-              className={`transition-opacity duration-500 ${
-                isVisible ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {Phrases[currentPhraseIndex]}.
+      <div className="w-full text-center pt-3 pb-6 sm:pt-0 sm:-mt-2 md:-mt-8 lg:-mt-12 mb-8 md:mb-12">
+        <div
+          style={{ height: "5rem" }}
+          className="sm:h-auto flex items-start justify-center pt-[0.5rem] sm:pt-0 sm:items-center md:my-4"
+        >
+          <h1 className="inline-block text-[#3ecf8e] font-semibold text-xl sm:text-2xl md:text-3xl lg:text-5xl px-2 m-0">
+            Fuel innovation & passion,&nbsp;
+            <br className="hidden sm:block" />
+            <span className="inline-block">
+              by tipping{" "}
+              <span
+                className={`transition-opacity duration-500 ${
+                  isVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {Phrases[currentPhraseIndex]}.
+              </span>
             </span>
-          </span>
-        </h1>
+          </h1>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row w-full gap-6">

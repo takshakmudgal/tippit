@@ -61,9 +61,35 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "9");
+    const offset = (page - 1) * limit;
+
+    console.log(
+      `API: page=${page}, limit=${limit}, offset=${offset}, search="${search}"`
+    );
+
+    const where: {
+      OR?: Array<{
+        title?: { contains: string; mode: "insensitive" };
+        id?: { contains: string; mode: "insensitive" };
+      }>;
+    } = {};
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { id: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const total = await prisma.submission.count({ where });
+
     const submissions = await prisma.submission.findMany({
+      where,
       select: {
         id: true,
         userId: true,
@@ -82,10 +108,18 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      skip: offset,
+      take: limit,
     });
 
-    return NextResponse.json(
-      submissions.map((sub) => {
+    console.log(
+      `API: Found ${
+        submissions.length
+      } submissions, total=${total}, totalPages=${Math.ceil(total / limit)}`
+    );
+
+    return NextResponse.json({
+      submissions: submissions.map((sub) => {
         let parsedGeolocation = sub.geolocation;
         if (typeof sub.geolocation === "string") {
           try {
@@ -100,8 +134,14 @@ export async function GET() {
           userWallet: sub.user.wallet,
           geolocation: parsedGeolocation,
         };
-      })
-    );
+      }),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("Error retrieving submissions:", error);
     return NextResponse.json(
