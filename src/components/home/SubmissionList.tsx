@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@jup-ag/wallet-adapter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   MapPin,
   ExternalLink,
   Info,
-  // Search,
   XCircle,
   FileSearch,
 } from "lucide-react";
@@ -38,63 +37,16 @@ export default function SubmissionList() {
     useState<Submission | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  // const [isSmallScreen, setIsSmallScreen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  // const [inputSearchTerm, setInputSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
     limit: 6,
     totalPages: 1,
   });
-  // const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout | null>(
-  //   null
-  // );
-  // const [preSearchPage, setPreSearchPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
 
-  useEffect(() => {
-    fetchSubmissions();
-    fetchSolPrice();
-
-    // const checkScreenSize = () => {
-    //   setIsSmallScreen(window.innerWidth < 1024);
-    // };
-
-    // checkScreenSize();
-
-    // window.addEventListener("resize", checkScreenSize);
-
-    // return () => window.removeEventListener("resize", checkScreenSize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // useEffect(() => {
-  //   setInputSearchTerm(searchTerm);
-  // }, []);
-
-  useEffect(() => {
-    if (searchTerm !== "") {
-      setCurrentPage(1);
-    }
-    fetchSubmissions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
-
-  useEffect(() => {
-    fetchSubmissions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
-
-  useEffect(() => {
-    const initialTipAmounts = submissions.reduce((acc, submission) => {
-      acc[submission.id] = 5;
-      return acc;
-    }, {} as { [key: string]: number });
-    setTipAmounts(initialTipAmounts);
-  }, [submissions]);
-
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams({
@@ -107,7 +59,6 @@ export default function SubmissionList() {
       }
 
       const url = `/api/v1/submission?${queryParams}`;
-      console.log(`Fetching submissions: ${url}`);
 
       const response = await fetch(url);
 
@@ -117,9 +68,6 @@ export default function SubmissionList() {
       }
 
       const data = await response.json();
-      console.log(
-        `Received ${data.submissions.length} submissions, page ${data.pagination.page} of ${data.pagination.totalPages}`
-      );
       setSubmissions(data.submissions);
       setPagination(data.pagination);
     } catch (error) {
@@ -132,12 +80,31 @@ export default function SubmissionList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, ITEMS_PER_PAGE]);
 
   const fetchSolPrice = async () => {
     const price = await getSolPriceInUSD();
     setSolPrice(price);
   };
+
+  useEffect(() => {
+    fetchSubmissions();
+    fetchSolPrice();
+  }, [fetchSubmissions]);
+
+  useEffect(() => {
+    if (searchTerm !== "") {
+      setCurrentPage(1);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const initialTipAmounts = submissions.reduce((acc, submission) => {
+      acc[submission.id] = 5;
+      return acc;
+    }, {} as { [key: string]: number });
+    setTipAmounts(initialTipAmounts);
+  }, [submissions]);
 
   const handleTip = async (submission: Submission) => {
     if (!connected || !publicKey || !signTransaction) {
@@ -216,7 +183,6 @@ export default function SubmissionList() {
   };
 
   const handlePageChange = (page: number) => {
-    console.log(`Changing to page ${page}`);
     setCurrentPage(page);
     document
       .querySelector(".submissions-container")
@@ -227,7 +193,6 @@ export default function SubmissionList() {
     setSelectedSubmission(submission);
   };
 
-  // Skeleton card component for reuse
   const SkeletonCard = () => (
     <div className="w-full h-auto rounded-xl bg-gray-800 overflow-hidden p-4 animate-pulse flex flex-col border border-[#7272724f] shadow-md">
       <div className="flex flex-row justify-between mb-4">
@@ -256,121 +221,6 @@ export default function SubmissionList() {
       </div>
     </div>
   );
-
-  // const SearchInputComponent = () => {
-  //   const inputRef = React.useRef<HTMLInputElement>(null);
-
-  //   const handleSearch = (e?: React.FormEvent) => {
-  //     e?.preventDefault();
-  //     if (inputSearchTerm && !searchTerm) {
-  //       setPreSearchPage(currentPage);
-  //     }
-  //     setSearchTerm(inputSearchTerm);
-  //     // No focus manipulation
-  //   };
-
-  //   const handleClearSearch = (e: React.MouseEvent) => {
-  //     e.preventDefault();
-  //     setInputSearchTerm("");
-  //     setTimeout(() => {
-  //       setCurrentPage(preSearchPage);
-  //       setSearchTerm("");
-  //     }, 0);
-  //     // No focus manipulation
-  //   };
-
-  //   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //     if (e.key === "Enter") {
-  //       e.preventDefault();
-  //       handleSearch();
-  //     }
-  //   };
-
-  //   const handleButtonClick = (e: React.MouseEvent) => {
-  //     e.preventDefault();
-  //     if (searchTerm) {
-  //       handleClearSearch(e);
-  //     } else {
-  //       handleSearch();
-  //     }
-  //   };
-
-  //   return (
-  //     <div className="w-full mt-8 sm:mt-10 mb-6 md:mb-3 flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
-  //       <form onSubmit={handleSearch} className="relative w-full md:w-64 flex">
-  //         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-  //           <Search className="h-4 w-4 text-gray-400" />
-  //         </div>
-  //         <input
-  //           ref={inputRef}
-  //           type="text"
-  //           value={inputSearchTerm}
-  //           onChange={(e) => setInputSearchTerm(e.target.value)}
-  //           onKeyDown={handleKeyDown}
-  //           placeholder="Search submissions..."
-  //           autoFocus={true}
-  //           className="w-full p-2 pl-10 pr-10 rounded-md bg-[#232424] border border-gray-300 text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]"
-  //         />
-  //         <button
-  //           type="button"
-  //           onClick={handleButtonClick}
-  //           className="absolute inset-y-0 right-0 flex items-center pr-2"
-  //           aria-label={searchTerm ? "Clear search" : "Search"}
-  //         >
-  //           <div className="p-1 hover:bg-[#3ecf8e20] rounded">
-  //             {searchTerm ? (
-  //               <svg
-  //                 xmlns="http://www.w3.org/2000/svg"
-  //                 width="16"
-  //                 height="16"
-  //                 viewBox="0 0 24 24"
-  //                 fill="none"
-  //                 stroke="currentColor"
-  //                 strokeWidth="2"
-  //                 strokeLinecap="round"
-  //                 strokeLinejoin="round"
-  //                 className="text-[#3ecf8e]"
-  //               >
-  //                 <path d="M18 6 6 18"></path>
-  //                 <path d="m6 6 12 12"></path>
-  //               </svg>
-  //             ) : (
-  //               <svg
-  //                 xmlns="http://www.w3.org/2000/svg"
-  //                 width="16"
-  //                 height="16"
-  //                 viewBox="0 0 24 24"
-  //                 fill="none"
-  //                 stroke="currentColor"
-  //                 strokeWidth="2"
-  //                 strokeLinecap="round"
-  //                 strokeLinejoin="round"
-  //                 className="text-[#3ecf8e]"
-  //               >
-  //                 <path d="M5 12h14"></path>
-  //                 <path d="m12 5 7 7-7 7"></path>
-  //               </svg>
-  //             )}
-  //           </div>
-  //         </button>
-  //       </form>
-  //       {searchTerm && pagination.total > 0 && (
-  //         <div className="text-sm text-gray-400 flex items-center">
-  //           <span className="bg-[#3ecf8e20] text-[#3ecf8e] px-2 py-0.5 rounded-full mr-2 text-xs font-medium">
-  //             {pagination.total}
-  //           </span>
-  //           <span>Result{pagination.total !== 1 ? "s" : ""} found</span>
-  //         </div>
-  //       )}
-  //       {searchTerm && pagination.total === 0 && !loading && (
-  //         <div className="text-sm text-gray-400 flex items-center">
-  //           <XCircle className="h-4 w-4 text-red-400 mr-2" />
-  //           <span>No results for "{searchTerm}"</span>
-  //         </div>
-  //       )}
-  //     </div>
-  //   );
-  // };
 
   if (loading && submissions.length === 0) {
     return (
@@ -413,8 +263,6 @@ export default function SubmissionList() {
             <Button
               variant="outline"
               onClick={() => {
-                // setInputSearchTerm("");
-                // setCurrentPage(preSearchPage);
                 setSearchTerm("");
               }}
               className="mt-4 text-[#3ecf8e] border-[#3ecf8e] hover:bg-[#3ecf8e20]"

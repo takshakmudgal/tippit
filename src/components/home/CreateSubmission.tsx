@@ -175,7 +175,9 @@ export default function CreateSubmission() {
         return;
       }
 
-      toast.success("Submission created successfully!");
+      toast.success(
+        "Your submission has been sent for review and will appear once approved! This typically takes 24-48 hours."
+      );
       setFormData({
         title: "",
         link: "",

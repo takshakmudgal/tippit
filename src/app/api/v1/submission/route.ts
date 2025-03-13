@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSubmissionSchema } from "@/schemas/submission";
+import { Prisma } from "@prisma/client";
 
 export async function POST(request: Request) {
   try {
@@ -68,17 +69,29 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "9");
     const offset = (page - 1) * limit;
+    const showAll = searchParams.get("showAll") === "true";
+    const status = searchParams.get("status");
+    const wallet = searchParams.get("wallet");
 
-    console.log(
-      `API: page=${page}, limit=${limit}, offset=${offset}, search="${search}"`
-    );
+    const where: Prisma.SubmissionWhereInput = {};
 
-    const where: {
-      OR?: Array<{
-        title?: { contains: string; mode: "insensitive" };
-        id?: { contains: string; mode: "insensitive" };
-      }>;
-    } = {};
+    if (!showAll && !status) {
+      where.status = "APPROVED" as Prisma.EnumSubmissionStatusFilter;
+    } else if (status) {
+      where.status = status as Prisma.EnumSubmissionStatusFilter;
+    }
+
+    if (wallet) {
+      const user = await prisma.user.findUnique({
+        where: { wallet },
+        select: { id: true },
+      });
+
+      if (user) {
+        where.userId = user.id;
+      }
+    }
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: "insensitive" } },
@@ -99,6 +112,10 @@ export async function GET(request: Request) {
         geolocation: true,
         currentTips: true,
         tipJarLimit: true,
+        status: true,
+        rejectionReason: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             wallet: true,
@@ -111,12 +128,6 @@ export async function GET(request: Request) {
       skip: offset,
       take: limit,
     });
-
-    console.log(
-      `API: Found ${
-        submissions.length
-      } submissions, total=${total}, totalPages=${Math.ceil(total / limit)}`
-    );
 
     return NextResponse.json({
       submissions: submissions.map((sub) => {
@@ -131,7 +142,7 @@ export async function GET(request: Request) {
 
         return {
           ...sub,
-          userWallet: sub.user.wallet,
+          userWallet: sub.user?.wallet || "",
           geolocation: parsedGeolocation,
         };
       }),

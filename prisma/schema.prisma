@@ -7,6 +7,12 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
+enum SubmissionStatus {
+  PENDING
+  REJECTED
+  APPROVED
+}
+
 model User {
   id          String      @id @default(uuid())
   wallet      String      @unique
@@ -14,20 +20,23 @@ model User {
   updatedAt   DateTime    @updatedAt
   submissions Submission[]
   tips        Tip[]
+  isAdmin     Boolean     @default(false)
 }
 
 model Submission {
-  id          String   @id @default(uuid())
+  id          String           @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User             @relation(fields: [userId], references: [id])
   title       String
   link        String
   geolocation String
   description String
-  tipJarLimit Float    @default(200.0)
-  currentTips Float    @default(0.0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tipJarLimit Float            @default(200.0)
+  currentTips Float            @default(0.0)
+  status      SubmissionStatus @default(PENDING)
+  rejectionReason String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   tips        Tip[]
 }
 

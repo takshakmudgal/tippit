@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Phrases } from "@/constants/submissions";
 import SubmissionList from "./SubmissionList";
 import CreateSubmission from "./CreateSubmission";
+import UserSubmissionStatus from "./UserSubmissionStatus";
 import { Container } from "../common/Container";
 
 export default function Submission() {
@@ -48,6 +49,7 @@ export default function Submission() {
 
       <div className="flex flex-col lg:flex-row w-full gap-6">
         <div className="w-full lg:w-3/4">
+          <UserSubmissionStatus />
           <SubmissionList />
         </div>
         <div className="w-full lg:w-1/4 mt-6 lg:mt-0">
