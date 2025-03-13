@@ -402,27 +402,29 @@ export default function SubmissionList() {
         </div>
       )}
 
-      {submissions.length > 0 && !loading && (
-        <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
-          <Pagination
-            loop
-            showControls
-            color="success"
-            page={currentPage}
-            total={pagination.totalPages > 0 ? pagination.totalPages : 1}
-            onChange={handlePageChange}
-            classNames={{
-              wrapper: "gap-1",
-              item: "text-white bg-transparent",
-              cursor: "bg-[#3ecf8e] text-black",
-            }}
-          />
-          <div className="text-gray-400 text-xs sm:mr-3 mt-2 sm:mt-0 sm:order-first">
-            Page {pagination.page} of {pagination.totalPages} • Showing{" "}
-            {submissions.length} of {pagination.total}
+      {submissions.length > 0 &&
+        !loading &&
+        pagination.total > ITEMS_PER_PAGE && (
+          <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
+            <Pagination
+              loop
+              showControls
+              color="success"
+              page={currentPage}
+              total={pagination.totalPages > 0 ? pagination.totalPages : 1}
+              onChange={handlePageChange}
+              classNames={{
+                wrapper: "gap-1",
+                item: "text-white bg-transparent",
+                cursor: "bg-[#3ecf8e] text-black",
+              }}
+            />
+            <div className="text-gray-400 text-xs sm:mr-3 mt-2 sm:mt-0 sm:order-first">
+              Page {pagination.page} of {pagination.totalPages} • Showing{" "}
+              {submissions.length} of {pagination.total}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {selectedSubmission && (
         <div
