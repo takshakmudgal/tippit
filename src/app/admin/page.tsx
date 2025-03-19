@@ -3,10 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@jup-ag/wallet-adapter";
 import { Container } from "@/components/common/Container";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button, Spinner, Tabs, Tab } from "@heroui/react";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
-import { Spinner } from "@heroui/react";
 import {
   Card,
   CardContent,
@@ -196,32 +194,25 @@ export default function AdminPage() {
           </h1>
 
           <Tabs
-            value={currentTab}
-            onValueChange={handleTabChange}
+            selectedKey={currentTab}
+            onSelectionChange={(key) => handleTabChange(key as string)}
             className="w-full"
+            classNames={{
+              tabList: "gap-0 bg-[#232424] rounded-lg p-1 mb-6",
+              tab: [
+                "text-gray-400 rounded-md px-4 py-2",
+                "data-[selected=true]:bg-[#3ecf8e]",
+                "data-[selected=true]:text-black",
+                "data-[selected=true]:font-medium",
+              ],
+            }}
           >
-            <TabsList className="mb-6 bg-[#232424]">
-              <TabsTrigger
-                value="pending"
-                className="data-[state=active]:bg-[#3ecf8e] data-[state=active]:text-black"
-              >
-                Pending ({currentTab === "pending" ? pagination.total : "..."})
-              </TabsTrigger>
-              <TabsTrigger
-                value="approved"
-                className="data-[state=active]:bg-[#3ecf8e] data-[state=active]:text-black"
-              >
-                Approved
-              </TabsTrigger>
-              <TabsTrigger
-                value="rejected"
-                className="data-[state=active]:bg-[#3ecf8e] data-[state=active]:text-black"
-              >
-                Rejected
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="pending" className="mt-0">
+            <Tab
+              key="pending"
+              title={`Pending (${
+                currentTab === "pending" ? pagination.total : "..."
+              })`}
+            >
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Spinner size="lg" />
@@ -307,7 +298,7 @@ export default function AdminPage() {
                         {currentTab === "pending" && (
                           <>
                             <Button
-                              variant="destructive"
+                              variant="bordered"
                               disabled={processingId !== null}
                               onClick={() =>
                                 updateSubmissionStatus(
@@ -349,7 +340,7 @@ export default function AdminPage() {
               {pagination.totalPages > 1 && (
                 <div className="flex justify-center mt-8 gap-2">
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={pagination.page === 1 || loading}
                     onClick={() =>
                       setPagination((prev) => ({
@@ -365,7 +356,7 @@ export default function AdminPage() {
                     Page {pagination.page} of {pagination.totalPages}
                   </span>
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={
                       pagination.page === pagination.totalPages || loading
                     }
@@ -381,9 +372,9 @@ export default function AdminPage() {
                   </Button>
                 </div>
               )}
-            </TabsContent>
+            </Tab>
 
-            <TabsContent value="approved" className="mt-0">
+            <Tab key="approved" title="Approved">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Spinner size="lg" />
@@ -439,7 +430,7 @@ export default function AdminPage() {
               {pagination.totalPages > 1 && (
                 <div className="flex justify-center mt-8 gap-2">
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={pagination.page === 1 || loading}
                     onClick={() =>
                       setPagination((prev) => ({
@@ -455,7 +446,7 @@ export default function AdminPage() {
                     Page {pagination.page} of {pagination.totalPages}
                   </span>
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={
                       pagination.page === pagination.totalPages || loading
                     }
@@ -471,9 +462,9 @@ export default function AdminPage() {
                   </Button>
                 </div>
               )}
-            </TabsContent>
+            </Tab>
 
-            <TabsContent value="rejected" className="mt-0">
+            <Tab key="rejected" title="Rejected">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Spinner size="lg" />
@@ -539,7 +530,7 @@ export default function AdminPage() {
               {pagination.totalPages > 1 && (
                 <div className="flex justify-center mt-8 gap-2">
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={pagination.page === 1 || loading}
                     onClick={() =>
                       setPagination((prev) => ({
@@ -555,7 +546,7 @@ export default function AdminPage() {
                     Page {pagination.page} of {pagination.totalPages}
                   </span>
                   <Button
-                    variant="outline"
+                    variant="bordered"
                     disabled={
                       pagination.page === pagination.totalPages || loading
                     }
@@ -571,7 +562,7 @@ export default function AdminPage() {
                   </Button>
                 </div>
               )}
-            </TabsContent>
+            </Tab>
           </Tabs>
         </div>
       </Container>

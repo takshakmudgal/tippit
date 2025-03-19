@@ -336,6 +336,7 @@ export default function SubmissionList() {
                           handleSliderChange(submission.id, value as number[])
                         }
                         className="flex-grow"
+                        color="success"
                       />
                       <span className="text-xs sm:text-sm">$50</span>
                     </div>
@@ -357,6 +358,7 @@ export default function SubmissionList() {
                         }
                         className="mt-1 flex-grow sm:flex-grow-0"
                         size="sm"
+                        color="success"
                       >
                         {tippingSubmissionId === submission.id ? (
                           <span className="flex items-center justify-center">
@@ -389,6 +391,7 @@ export default function SubmissionList() {
                         onClick={() => handleViewDetails(submission)}
                         className="mt-1 text-xs"
                         size="sm"
+                        color="secondary"
                       >
                         <Info className="h-3.5 w-3.5 mr-1" />
                         Details
@@ -445,6 +448,7 @@ export default function SubmissionList() {
                 onClick={() => setSelectedSubmission(null)}
                 className="text-xs"
                 size="sm"
+                color="secondary"
               >
                 Close
               </Button>
