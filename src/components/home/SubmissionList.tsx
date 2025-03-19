@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@jup-ag/wallet-adapter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Button } from "@heroui/react";
+import { Slider } from "@heroui/react";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
 import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
@@ -261,7 +261,7 @@ export default function SubmissionList() {
           </p>
           {searchTerm && (
             <Button
-              variant="outline"
+              variant="bordered"
               onClick={() => {
                 setSearchTerm("");
               }}
@@ -328,12 +328,12 @@ export default function SubmissionList() {
                     <div className="flex flex-row text-white gap-1 sm:gap-2 items-center">
                       <span className="text-xs sm:text-sm">$5</span>
                       <Slider
-                        min={5}
-                        max={50}
+                        minValue={5}
+                        maxValue={50}
                         step={5}
                         value={[tipAmount]}
-                        onValueChange={(value) =>
-                          handleSliderChange(submission.id, value)
+                        onChange={(value) =>
+                          handleSliderChange(submission.id, value as number[])
                         }
                         className="flex-grow"
                       />
@@ -347,7 +347,7 @@ export default function SubmissionList() {
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <Button
-                        variant={"tippit"}
+                        variant={"bordered"}
                         onClick={() => handleTip(submission)}
                         disabled={
                           !connected ||
@@ -385,7 +385,7 @@ export default function SubmissionList() {
                       </Button>
 
                       <Button
-                        variant="outline"
+                        variant="bordered"
                         onClick={() => handleViewDetails(submission)}
                         className="mt-1 text-xs"
                         size="sm"
@@ -441,7 +441,7 @@ export default function SubmissionList() {
                 {selectedSubmission.title}
               </h3>
               <Button
-                variant="outline"
+                variant="bordered"
                 onClick={() => setSelectedSubmission(null)}
                 className="text-xs"
                 size="sm"

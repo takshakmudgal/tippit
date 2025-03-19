@@ -5,6 +5,7 @@ import { Phrases } from "@/constants/submissions";
 import SubmissionList from "./SubmissionList";
 import CreateSubmission from "./CreateSubmission";
 import UserSubmissionStatus from "./UserSubmissionStatus";
+import Leaderboard from "./Leaderboard";
 import { Container } from "../common/Container";
 
 export default function Submission() {
@@ -55,6 +56,11 @@ export default function Submission() {
         <div className="w-full lg:w-1/4 mt-6 lg:mt-0">
           <CreateSubmission />
         </div>
+      </div>
+
+      {/* Leaderboard Section */}
+      <div className="mt-12 pt-8 border-t border-[#7272724f]">
+        <Leaderboard />
       </div>
     </Container>
   );

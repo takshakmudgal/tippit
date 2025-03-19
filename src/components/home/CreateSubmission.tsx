@@ -9,7 +9,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@heroui/react";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
 import { Spinner } from "@heroui/react";
 import { PlusCircle, MapPin } from "lucide-react";
