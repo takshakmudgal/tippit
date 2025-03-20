@@ -33,7 +33,7 @@ export function WalletProvider({ children }: WalletProvider) {
     <UnifiedWalletProvider
       wallets={wallets}
       config={{
-        autoConnect: false,
+        autoConnect: true,
         env: "devnet",
         metadata: {
           name: "UnifiedWallet",

@@ -18,6 +18,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "tippit",
   description: "Tip comunnity work and projects.",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({

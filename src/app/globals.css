@@ -178,3 +178,19 @@ body {
     opacity: 1;
   }
 }
+
+/* Add perspective to parent container */
+.perspective-1000 {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(62, 207, 142, 0.2);
+}

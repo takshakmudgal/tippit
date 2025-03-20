@@ -26,7 +26,7 @@ export default function Submission() {
 
   return (
     <Container>
-      <div className="w-full text-center pt-3 pb-6 sm:pt-0 sm:-mt-2 md:-mt-8 lg:-mt-12 mb-8 md:mb-12">
+      <div className="w-full text-center pt-3 pb-6 sm:pt-0 sm:-mt-2 md:-mt-8 lg:-mt-12 mb-8 md:mb-2">
         <div
           style={{ height: "5rem" }}
           className="sm:h-auto flex items-start justify-center pt-[0.5rem] sm:pt-0 sm:items-center md:my-4"
@@ -47,21 +47,32 @@ export default function Submission() {
           </h1>
         </div>
       </div>
-
-      <div className="flex flex-col lg:flex-row w-full gap-6">
-        <div className="w-full lg:w-3/4">
-          <UserSubmissionStatus />
-          <SubmissionList />
-        </div>
-        <div className="w-full lg:w-1/4 mt-6 lg:mt-0">
-          <CreateSubmission />
-        </div>
-      </div>
-
-      {/* Leaderboard Section */}
-      <div className="mt-12 pt-8 border-t border-[#7272724f]">
+      <div className="hidden lg:flex flex-row  md:space-x-10">
+        <CreateSubmission />
+        <SubmissionList />
         <Leaderboard />
+        <UserSubmissionStatus />
       </div>
+      <div className="flex flex-col lg:hidden space-y-6">
+        <SubmissionList />
+        <Leaderboard />
+        <UserSubmissionStatus />
+        <CreateSubmission />
+      </div>
+      {/* <div className="flex flex-row space-x-10 justify-center">
+        <UserSubmissionStatus />
+        <CreateSubmission />
+        <SubmissionList />
+        <div className="flex flex-col">
+          <Leaderboard />
+        </div>
+      </div> */}
+      {/* <div className="flex flex-col space-y-10">
+        <SubmissionList />
+        <UserSubmissionStatus />
+        <CreateSubmission />
+        <Leaderboard />
+      </div> */}
     </Container>
   );
 }

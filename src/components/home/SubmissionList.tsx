@@ -9,7 +9,8 @@ import { ToastNotification } from "@/components/common/ToastNotificationDisplay"
 import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 import { Submission } from "@/types/submission";
-import { Spinner, Pagination } from "@heroui/react";
+import { Spinner } from "@heroui/react";
+// import { TipJar } from "../ui/tipjar";
 import {
   CircleFadingArrowUp,
   MapPin,
@@ -17,6 +18,8 @@ import {
   Info,
   XCircle,
   FileSearch,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const toast = new ToastNotification("submission-list");
@@ -35,15 +38,10 @@ export default function SubmissionList() {
   );
   const [selectedSubmission, setSelectedSubmission] =
     useState<Submission | null>(null);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    limit: 6,
-    totalPages: 1,
-  });
   const ITEMS_PER_PAGE = 6;
 
   const fetchSubmissions = useCallback(async () => {
@@ -69,7 +67,6 @@ export default function SubmissionList() {
 
       const data = await response.json();
       setSubmissions(data.submissions);
-      setPagination(data.pagination);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -182,25 +179,36 @@ export default function SubmissionList() {
     setTipAmounts((prev) => ({ ...prev, [submissionId]: value[0] }));
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    document
-      .querySelector(".submissions-container")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const handleViewDetails = (submission: Submission) => {
     setSelectedSubmission(submission);
   };
 
+  const handleNextCard = () => {
+    if (submissions.length === 0) return;
+    setActiveCardIndex((prevIndex) =>
+      prevIndex === submissions.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handlePrevCard = () => {
+    if (submissions.length === 0) return;
+    setActiveCardIndex((prevIndex) =>
+      prevIndex === 0 ? submissions.length - 1 : prevIndex - 1
+    );
+  };
+
+  useEffect(() => {
+    setActiveCardIndex(0);
+  }, [submissions]);
+
   const SkeletonCard = () => (
-    <div className="w-full h-auto rounded-xl bg-gray-800 overflow-hidden p-4 animate-pulse flex flex-col border border-[#7272724f] shadow-md">
+    <div className="w-[300px] h-[400px] rounded-xl bg-gray-800 overflow-hidden p-4 animate-pulse flex flex-col border border-[#7272724f] shadow-md">
       <div className="flex flex-row justify-between mb-4">
         <div className="flex-1">
-          <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
-          <div className="h-3 bg-[#3ecf8e30] rounded w-1/2"></div>
+          <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-[#3ecf8e30] rounded w-1/2"></div>
         </div>
-        <div className="w-16 h-10 bg-gray-700 rounded ml-2"></div>
+        <div className="w-16 h-6 bg-gray-700 rounded ml-2"></div>
       </div>
       <div className="space-y-2 mb-4 w-full pr-0">
         <div className="h-3 bg-gray-700 rounded w-full"></div>
@@ -217,28 +225,72 @@ export default function SubmissionList() {
 
         <div className="h-4 bg-gray-700 rounded w-32 mb-3"></div>
 
-        <div className="h-9 bg-[#3ecf8e30] rounded-md w-full sm:w-36"></div>
+        <div className="h-9 bg-[#3ecf8e30] rounded-md w-full"></div>
       </div>
     </div>
   );
 
   if (loading && submissions.length === 0) {
     return (
-      <div className="w-full mx-auto p-0 submissions-container">
-        <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full opacity-30">
-          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
+      <div className="w-full mx-auto p-0">
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="w-[300px] relative">
+            <div className="relative h-[450px] w-[300px] flex items-center justify-center perspective-1000 my-2">
+              <div
+                className="absolute top-0 left-0 w-[300px] h-[400px]"
+                style={{
+                  transform:
+                    "translateZ(-20px) scale(0.95) translateX(20px) rotate(2deg)",
+                  opacity: 0.8,
+                  zIndex: 2,
+                }}
+              >
+                <SkeletonCard />
+              </div>
+              <div
+                className="absolute top-0 left-0 w-[300px] h-[400px]"
+                style={{
+                  transform: "translateZ(0) scale(1) rotate(0deg)",
+                  opacity: 1,
+                  zIndex: 3,
+                }}
+              >
+                <SkeletonCard />
+              </div>
+              <div
+                className="absolute top-0 left-0 w-[300px] h-[400px]"
+                style={{
+                  transform:
+                    "translateZ(-40px) scale(0.9) translateX(40px) rotate(3deg)",
+                  opacity: 0.6,
+                  zIndex: 1,
+                }}
+              >
+                <SkeletonCard />
+              </div>
+            </div>
+            <div className="flex justify-center gap-2 -mt-8">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div
+                  key={index}
+                  className="h-2 w-2 rounded-full bg-gray-600 animate-pulse"
+                />
+              ))}
+            </div>
+            <div className="text-gray-400 text-xs text-center mt-3 animate-pulse">
+              <div className="h-4 bg-gray-700 rounded w-32 mx-auto mb-1"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full mx-auto p-0 submissions-container">
+    <div>
       {loading && submissions.length > 0 && (
         <div className="w-full mb-4">
-          <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full opacity-30">
+          <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full justify-center opacity-30">
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
@@ -262,7 +314,7 @@ export default function SubmissionList() {
           {searchTerm && (
             <Button
               variant="bordered"
-              onClick={() => {
+              onPress={() => {
                 setSearchTerm("");
               }}
               className="mt-4 text-[#3ecf8e] border-[#3ecf8e] hover:bg-[#3ecf8e20]"
@@ -275,160 +327,212 @@ export default function SubmissionList() {
       )}
 
       {submissions.length > 0 && !loading && (
-        <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full">
-          {submissions.map((submission) => {
-            const isOwnSubmission =
-              connected &&
-              publicKey &&
-              submission.userWallet === publicKey.toString();
-            const isTipped = tippedSubmissions.has(submission.id);
-            const tipAmount = tipAmounts[submission.id] || 5;
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="w-[300px] relative">
+            <div className="relative h-[450px] w-[300px] flex items-center justify-center perspective-1000">
+              {submissions.map((submission, index) => {
+                const isOwnSubmission =
+                  connected &&
+                  publicKey &&
+                  submission.userWallet === publicKey.toString();
+                const isTipped = tippedSubmissions.has(submission.id);
+                const tipAmount = tipAmounts[submission.id] || 5;
 
-            return (
-              <Card
-                key={submission.id}
-                className="bg-transparent h-auto w-full flex flex-col border-[#7272724f] shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                <CardHeader className="flex flex-row justify-between p-3 sm:p-4">
-                  <div className="overflow-hidden mr-2 flex-1">
-                    <CardTitle className="text-white text-sm xs:text-base md:text-lg break-words hyphens-auto">
-                      {submission.title}
-                    </CardTitle>
-                    <a
-                      href={submission.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#3ecf8e] underline underline-offset-2 text-xs break-all hyphens-auto line-clamp-1 mt-1"
-                    >
-                      {submission.link}
-                    </a>
+                const offset =
+                  (index - activeCardIndex + submissions.length) %
+                  submissions.length;
+                const visible = offset <= 2;
+                const zIndex = submissions.length - offset;
 
-                    {submission.geolocation && (
-                      <div className="mt-1 flex items-start">
-                        <div className="text-xs text-gray-400 flex gap-1 items-start">
-                          <MapPin className="h-3 w-3 text-[#3ecf8e] flex-shrink-0" />
-                          <span className="line-clamp-1">
-                            {submission.geolocation.formattedAddress}
+                let transform = "scale(1)";
+                let opacity = 1;
+
+                if (offset === 0) {
+                  transform = "translateZ(0) scale(1) rotate(0deg)";
+                } else if (offset === 1) {
+                  transform =
+                    "translateZ(-20px) scale(0.95) translateX(20px) rotate(2deg)";
+                  opacity = 0.8;
+                } else if (offset === 2) {
+                  transform =
+                    "translateZ(-40px) scale(0.9) translateX(40px) rotate(3deg)";
+                  opacity = 0.6;
+                } else {
+                  opacity = 0;
+                }
+
+                return (
+                  <Card
+                    key={submission.id}
+                    className={`absolute top-0 left-0 w-[300px] bg-[#121313] h-[400px] flex flex-col border-[#7272724f] shadow-md transition-all duration-500 ${
+                      index === activeCardIndex
+                        ? "shadow-[0_0_20px_rgba(62,207,142,0.2)] card-hover"
+                        : ""
+                    }`}
+                    style={{
+                      zIndex,
+                      transform,
+                      opacity,
+                      display: visible ? "flex" : "none",
+                    }}
+                  >
+                    <CardHeader className="flex flex-row justify-between p-3 sm:p-4">
+                      <div className="overflow-hidden mr-2 flex-1">
+                        <CardTitle className="text-white text-sm xs:text-base md:text-lg break-words hyphens-auto">
+                          {submission.title}
+                        </CardTitle>
+                        <a
+                          href={submission.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#3ecf8e] underline underline-offset-2 text-xs break-all hyphens-auto line-clamp-1 mt-1"
+                        >
+                          {submission.link}
+                        </a>
+
+                        {submission.geolocation && (
+                          <div className="mt-1 flex items-start">
+                            <div className="text-xs text-gray-400 flex gap-1 items-start">
+                              <MapPin className="h-3 w-3 text-[#3ecf8e] flex-shrink-0" />
+                              <span className="line-clamp-1">
+                                {submission.geolocation.formattedAddress}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white leading-5 text-center text-xs whitespace-nowrap ml-2 flex-shrink-0">
+                        ${submission.currentTips.toFixed(2)}
+                        <br />
+                        Tipped!
+                      </p>
+                    </CardHeader>
+                    {/* <TipJar /> */}
+                    <CardContent className="flex-grow flex flex-col p-2 sm:p-3 pt-0">
+                      <p className="text-white text-xs sm:text-lg leading-tight mb-3 line-clamp-6 w-full pr-0">
+                        {submission.description}
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex flex-row text-white gap-1 sm:gap-2 items-center">
+                          <span className="text-xs sm:text-sm">$5</span>
+                          <Slider
+                            minValue={5}
+                            maxValue={50}
+                            step={5}
+                            value={[tipAmount]}
+                            onChange={(value) =>
+                              handleSliderChange(
+                                submission.id,
+                                value as number[]
+                              )
+                            }
+                            className="flex-grow"
+                            color="success"
+                          />
+                          <span className="text-xs sm:text-sm">$50</span>
+                        </div>
+                        <p className="mt-2 mb-2 text-white text-sm">
+                          Tip Amount:{" "}
+                          <span className="text-[#3ecf8e]">
+                            ${tipAmount.toFixed(2)}
                           </span>
+                        </p>
+                        <div className="flex flex-row gap-2">
+                          <Button
+                            variant={"bordered"}
+                            onPress={() => handleTip(submission)}
+                            disabled={
+                              !connected ||
+                              isOwnSubmission ||
+                              isTipped ||
+                              tippingSubmissionId === submission.id
+                            }
+                            className="mt-1 flex-grow sm:flex-grow-0"
+                            size="sm"
+                            color="success"
+                          >
+                            {tippingSubmissionId === submission.id ? (
+                              <span className="flex items-center justify-center">
+                                <Spinner
+                                  variant="spinner"
+                                  color="default"
+                                  size="sm"
+                                  classNames={{
+                                    wrapper: "mr-2",
+                                  }}
+                                />
+                                Tipping...
+                              </span>
+                            ) : isTipped ? (
+                              "Tipped!"
+                            ) : isOwnSubmission ? (
+                              "Can't tip own submission"
+                            ) : !connected ? (
+                              "Connect Wallet to Tip"
+                            ) : (
+                              <span className="flex items-center justify-center ">
+                                Send Tip!
+                                <CircleFadingArrowUp className="ml-2 h-4 w-4 animate-fade" />
+                              </span>
+                            )}
+                          </Button>
+
+                          <Button
+                            variant="bordered"
+                            onPress={() => handleViewDetails(submission)}
+                            className="mt-1 text-xs"
+                            size="sm"
+                            color="secondary"
+                          >
+                            <Info className="h-3.5 w-3.5 mr-1" />
+                            Details
+                          </Button>
                         </div>
                       </div>
-                    )}
-                  </div>
-                  <p className="text-white leading-5 text-center text-xs whitespace-nowrap ml-2 flex-shrink-0">
-                    ${submission.currentTips.toFixed(2)}
-                    <br />
-                    Tipped!
-                  </p>
-                </CardHeader>
-                <CardContent className="flex-grow flex flex-col p-2 sm:p-3 pt-0">
-                  <p className="text-white text-xs sm:text-sm leading-tight mb-3 line-clamp-3 w-full pr-0">
-                    {submission.description}
-                  </p>
-                  <div className="mt-auto">
-                    <div className="flex flex-row text-white gap-1 sm:gap-2 items-center">
-                      <span className="text-xs sm:text-sm">$5</span>
-                      <Slider
-                        minValue={5}
-                        maxValue={50}
-                        step={5}
-                        value={[tipAmount]}
-                        onChange={(value) =>
-                          handleSliderChange(submission.id, value as number[])
-                        }
-                        className="flex-grow"
-                        color="success"
-                      />
-                      <span className="text-xs sm:text-sm">$50</span>
-                    </div>
-                    <p className="mt-2 mb-2 text-white text-sm">
-                      Tip Amount:{" "}
-                      <span className="text-[#3ecf8e]">
-                        ${tipAmount.toFixed(2)}
-                      </span>
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant={"bordered"}
-                        onClick={() => handleTip(submission)}
-                        disabled={
-                          !connected ||
-                          isOwnSubmission ||
-                          isTipped ||
-                          tippingSubmissionId === submission.id
-                        }
-                        className="mt-1 flex-grow sm:flex-grow-0"
-                        size="sm"
-                        color="success"
-                      >
-                        {tippingSubmissionId === submission.id ? (
-                          <span className="flex items-center justify-center">
-                            <Spinner
-                              variant="spinner"
-                              color="default"
-                              size="sm"
-                              classNames={{
-                                wrapper: "mr-2",
-                              }}
-                            />
-                            Tipping...
-                          </span>
-                        ) : isTipped ? (
-                          "Tipped!"
-                        ) : isOwnSubmission ? (
-                          "Can't tip own submission"
-                        ) : !connected ? (
-                          "Connect Wallet to Tip"
-                        ) : (
-                          <span className="flex items-center justify-center ">
-                            Send Tip!
-                            <CircleFadingArrowUp className="ml-2 h-4 w-4 animate-fade" />
-                          </span>
-                        )}
-                      </Button>
-
-                      <Button
-                        variant="bordered"
-                        onClick={() => handleViewDetails(submission)}
-                        className="mt-1 text-xs"
-                        size="sm"
-                        color="secondary"
-                      >
-                        <Info className="h-3.5 w-3.5 mr-1" />
-                        Details
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
-      {submissions.length > 0 &&
-        !loading &&
-        pagination.total > ITEMS_PER_PAGE && (
-          <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
-            <Pagination
-              loop
-              showControls
-              color="success"
-              page={currentPage}
-              total={pagination.totalPages > 0 ? pagination.totalPages : 1}
-              onChange={handlePageChange}
-              classNames={{
-                wrapper: "gap-1",
-                item: "text-white bg-transparent",
-                cursor: "bg-[#3ecf8e] text-black",
-              }}
-            />
-            <div className="text-gray-400 text-xs sm:mr-3 mt-2 sm:mt-0 sm:order-first">
-              Page {pagination.page} of {pagination.totalPages} • Showing{" "}
-              {submissions.length} of {pagination.total}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            <div className="flex items-center justify-center gap-4 -mt-8">
+              <Button
+                variant="bordered"
+                onPress={handlePrevCard}
+                className="rounded-full aspect-square min-w-8 h-8 bg-[#181919] border-[#3ecf8e33] text-[#3ecf8e] hover:bg-[#3ecf8e20] hover:scale-110 p-0 shadow-md transition-all duration-300"
+                disabled={loading || submissions.length <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex gap-2">
+                {submissions.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      index === activeCardIndex
+                        ? "bg-[#3ecf8e] w-6 shadow-[0_0_10px_rgba(62,207,142,0.5)]"
+                        : "bg-gray-600 w-2 hover:bg-gray-400"
+                    }`}
+                    onClick={() => setActiveCardIndex(index)}
+                    aria-label={`Go to card ${index + 1}`}
+                  />
+                ))}
+              </div>
+              <Button
+                variant="bordered"
+                onPress={handleNextCard}
+                className="rounded-full aspect-square min-w-8 h-8 bg-[#181919] border-[#3ecf8e33] text-[#3ecf8e] hover:bg-[#3ecf8e20] hover:scale-110 p-0 shadow-md transition-all duration-300"
+                disabled={loading || submissions.length <= 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="text-gray-400 text-xs text-center mt-1">
+              Card {activeCardIndex + 1} of {submissions.length} • $
+              {submissions[activeCardIndex]?.currentTips.toFixed(2)} tipped
             </div>
           </div>
-        )}
-
+        </div>
+      )}
       {selectedSubmission && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300"
@@ -445,7 +549,7 @@ export default function SubmissionList() {
               </h3>
               <Button
                 variant="bordered"
-                onClick={() => setSelectedSubmission(null)}
+                onPress={() => setSelectedSubmission(null)}
                 className="text-xs"
                 size="sm"
                 color="secondary"

@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 
     const where: Prisma.SubmissionWhereInput = {};
 
-    if (!showAll && !status) {
+    if (!showAll && !status && !wallet) {
       where.status = "APPROVED" as Prisma.EnumSubmissionStatusFilter;
     } else if (status) {
       where.status = status as Prisma.EnumSubmissionStatusFilter;
