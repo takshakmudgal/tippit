@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tippit
+
+Tippit is a decentralized tipping platform built on Solana that enables users to submit content and receive cryptocurrency tips from the community. The platform connects creators with supporters through a seamless, blockchain-based reward system.
+
+## Features
+
+- **Content Submissions**: Users can submit content with titles, links, descriptions, and geolocation
+- **Solana Integration**: Built-in wallet connection and transaction support
+- **Tip Management**: Set tip jar limits and track tip amounts
+- **Admin Dashboard**: Review and moderate submissions
+- **Leaderboard**: Track the most popular and well-tipped content
+- **Responsive Design**: Full mobile support with adaptive UI components
+
+## Project Structure
+
+```
+/src
+  /app         # Next.js app router structure
+  /components  # React components
+  /hooks       # Custom React hooks
+  /lib         # Core utilities and shared logic
+  /providers   # Context providers
+  /schemas     # Zod validation schemas
+  /types       # TypeScript type definitions
+  /utils       # Helper functions
+/prisma        # Database schema and migrations
+```
+
+## Data Models
+
+The application uses the following core data models:
+
+- **User**: Wallet-connected users who can create submissions and send tips
+- **Submission**: Content submissions with metadata and tip jar limits
+- **Tip**: Individual tip transactions with amounts and transaction signatures
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- pnpm package manager
+- PostgreSQL database
+- Solana wallet (Phantom, Solflare, etc.)
+
+### Installation
+
+1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/takshakmudgal/tippit.git
+cd tippit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up environment variables
 
-## Learn More
+```bash
+# Create a .env file with the following variables
+POSTGRES_URL="postgresql://username:password@localhost:5432/tippit"
+# Add any other required environment variables
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Run database migrations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm prisma migrate dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Start the development server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Open [http://localhost:3000](http://localhost:3000) to view the application
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development
+
+### Key Components
+
+- **Submission**: Handles the creation and listing of user submissions
+- **Wallet Integration**: Manages Solana wallet connections and transactions
+- **Tipping System**: Processes and validates tip transactions
+
+### API Routes
+
+The application uses Next.js API routes for server-side operations:
+
+- `/api/v1/user` - User creation and authentication
+- `/api/v1/submission` - Manage content submissions
+- `/api/v1/tip` - Process tipping transactions
+
+## Deployment
+
+The application is designed to be deployed on Vercel, but can be deployed on any platform that supports Next.js applications.
+
+```bash
+pnpm build
+pnpm start
+```
+
+## License
+
+This project is open source.
