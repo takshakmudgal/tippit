@@ -6,10 +6,10 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
-export const SOLANA_CONNECTION = new Connection(
-  "https://api.devnet.solana.com",
-  "confirmed"
-);
+const SOLANA_RPC_URL =
+  process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
+
+export const SOLANA_CONNECTION = new Connection(SOLANA_RPC_URL, "confirmed");
 
 export async function sendSolTip(
   fromPubkey: PublicKey,

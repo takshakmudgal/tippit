@@ -13,8 +13,7 @@ import { Button } from "@heroui/react";
 import { ToastNotification } from "@/components/common/ToastNotificationDisplay";
 import { Spinner } from "@heroui/react";
 import { PlusCircle, MapPin } from "lucide-react";
-import Autocomplete from "react-google-autocomplete";
-import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
+import { SecureGoogleAutocomplete } from "@/components/ui/SecureGoogleAutocomplete";
 import { createSubmissionSchema } from "@/schemas/submission";
 import {
   validateForm,
@@ -22,13 +21,10 @@ import {
 } from "@/utils/form-validation";
 
 const toast = new ToastNotification("create-submission");
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GCP_API_KEY || "";
 
 export default function CreateSubmission() {
   const { publicKey, connected } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { loading: scriptLoading, loaded: scriptLoaded } =
-    useGoogleMapsScript(GOOGLE_MAPS_API_KEY);
   const [formData, setFormData] = useState({
     title: "",
     link: "",
@@ -76,7 +72,16 @@ export default function CreateSubmission() {
     });
   };
 
-  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
+  const handlePlaceSelected = (place: {
+    place_id: string;
+    formatted_address: string;
+    geometry: {
+      location: {
+        lat: number;
+        lng: number;
+      };
+    };
+  }) => {
     if (
       !place ||
       !place.place_id ||
@@ -93,8 +98,8 @@ export default function CreateSubmission() {
     const location = {
       placeId: place.place_id,
       formattedAddress: place.formatted_address,
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
+      lat: place.geometry.location.lat,
+      lng: place.geometry.location.lng,
     };
 
     setFormData((prev) => ({
@@ -200,52 +205,17 @@ export default function CreateSubmission() {
   };
 
   const renderLocationInput = () => {
-    if (scriptLoading) {
-      return (
-        <div
-          className={`w-full p-2 rounded-md bg-[#232424] border ${
-            errors["geolocation.placeId"] || errors["geolocation"]
-              ? "border-red-500"
-              : "border-[#7272724f]"
-          } text-gray-500 flex items-center justify-center`}
-        >
-          <Spinner size="sm" className="mr-2" /> Loading map service...
-        </div>
-      );
-    }
-
-    if (!scriptLoaded) {
-      return (
-        <div
-          className={`w-full p-2 rounded-md bg-[#232424] border ${
-            errors["geolocation.placeId"] || errors["geolocation"]
-              ? "border-red-500"
-              : "border-[#7272724f]"
-          } text-gray-500 flex items-center justify-center`}
-        >
-          Failed to load map service. Please refresh the page.
-        </div>
-      );
-    }
-
     return (
-      <Autocomplete
+      <SecureGoogleAutocomplete
         onPlaceSelected={handlePlaceSelected}
         placeholder="Search for a location (required)..."
-        className={`w-full p-2 rounded-md bg-[#232424] border ${
-          errors["geolocation.placeId"] ||
-          errors["geolocation"] ||
-          errors["location.placeId"]
-            ? "border-red-500"
-            : "border-[#7272724f]"
-        } text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#3ecf8e]`}
-        options={{
-          types: ["establishment", "geocode"],
-          fields: ["place_id", "formatted_address", "geometry"],
-          componentRestrictions: { country: [] },
-          strictBounds: false,
-        }}
-        apiKey={GOOGLE_MAPS_API_KEY}
+        error={
+          !!(
+            errors["geolocation.placeId"] ||
+            errors["geolocation"] ||
+            errors["location.placeId"]
+          )
+        }
       />
     );
   };
