@@ -16,8 +16,24 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "tippit",
-  description: "Tip comunnity work and projects.",
+  title: "tippit.xyz | Tip community work and projects",
+  description:
+    "Tip and support community work and projects on the blockchain with tippit.xyz",
+  metadataBase: new URL("https://tippit.xyz"),
+  openGraph: {
+    title: "tippit.xyz",
+    description:
+      "Tip and support community work and projects on the blockchain",
+    url: "https://tippit.xyz",
+    siteName: "tippit.xyz",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "tippit.xyz",
+    description:
+      "Tip and support community work and projects on the blockchain",
+  },
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

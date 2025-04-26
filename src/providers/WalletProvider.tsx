@@ -10,10 +10,10 @@ export function WalletProvider({ children }: WalletProvider) {
   const { reownAdapter, jupiterAdapter } = useWrappedReownAdapter({
     appKitOptions: {
       metadata: {
-        name: "tippit",
+        name: "tippit.xyz",
         description: "Tipping Jar for the Web3 community.",
-        url: "http://localhost:3000/",
-        icons: ["https://assets.reown.com/reown-profile-pic.png"],
+        url: "https://tippit.xyz/",
+        icons: ["https://tippit.xyz/favicon.ico"],
       },
       projectId: "13417c671b602fb8f3273cdbd94e09c6",
       features: {
@@ -36,10 +36,11 @@ export function WalletProvider({ children }: WalletProvider) {
         autoConnect: true,
         env: "devnet",
         metadata: {
-          name: "UnifiedWallet",
-          description: "UnifiedWallet",
-          url: "https://jup.ag",
-          iconUrls: ["https://jup.ag/favicon.ico"],
+          name: "tippit.xyz",
+          description:
+            "Tip and support community work and projects on the blockchain",
+          url: "https://tippit.xyz",
+          iconUrls: ["https://tippit.xyz/favicon.ico"],
         },
         notificationCallback: WalletNotification,
         walletlistExplanation: {
