@@ -1,11 +1,5 @@
 import { ZodError, ZodSchema } from "zod";
 
-/**
- * Validates form data against a Zod schema
- * @param schema The Zod schema to validate against
- * @param data The data to validate
- * @returns An object containing validation results
- */
 export function validateForm<T>(
   schema: ZodSchema,
   data: unknown
@@ -44,11 +38,6 @@ export function validateForm<T>(
   }
 }
 
-/**
- * Formats API validation errors from Zod
- * @param apiError The error response from the API
- * @returns A formatted error object
- */
 export function formatApiValidationErrors(
   apiError: unknown
 ): Record<string, string> {

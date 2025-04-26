@@ -22,7 +22,7 @@ import {
 } from "@/utils/form-validation";
 
 const toast = new ToastNotification("create-submission");
-const GOOGLE_MAPS_API_KEY = process.env.GCP_API_KEY || "";
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GCP_API_KEY || "";
 
 export default function CreateSubmission() {
   const { publicKey, connected } = useWallet();

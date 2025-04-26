@@ -10,7 +10,6 @@ import { sendSolTip, getWalletBalance, getSolPriceInUSD } from "@/utils/solana";
 import { PublicKey } from "@solana/web3.js";
 import { Submission } from "@/types/submission";
 import { Spinner } from "@heroui/react";
-// import { TipJar } from "../ui/tipjar";
 import {
   CircleFadingArrowUp,
   MapPin,
@@ -148,8 +147,9 @@ export default function SubmissionList() {
         },
         body: JSON.stringify({
           submissionId: submission.id,
-          wallet: publicKey.toString(),
+          userWallet: publicKey.toString(),
           amount: tipAmount,
+          currency: "USD",
           transactionSignature,
         }),
       });
@@ -402,12 +402,12 @@ export default function SubmissionList() {
                         )}
                       </div>
                       <p className="text-white leading-5 text-center text-xs whitespace-nowrap ml-2 flex-shrink-0">
-                        ${submission.currentTips.toFixed(2)}
+                        ${submission.currentTips.toFixed(2)} / $
+                        {submission.tipJarLimit.toFixed(2)}
                         <br />
                         Tipped!
                       </p>
                     </CardHeader>
-                    {/* <TipJar /> */}
                     <CardContent className="flex-grow flex flex-col p-2 sm:p-3 pt-0">
                       <p className="text-white text-xs sm:text-lg leading-tight mb-3 line-clamp-6 w-full pr-0">
                         {submission.description}

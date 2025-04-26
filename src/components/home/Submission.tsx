@@ -59,20 +59,6 @@ export default function Submission() {
         <UserSubmissionStatus />
         <CreateSubmission />
       </div>
-      {/* <div className="flex flex-row space-x-10 justify-center">
-        <UserSubmissionStatus />
-        <CreateSubmission />
-        <SubmissionList />
-        <div className="flex flex-col">
-          <Leaderboard />
-        </div>
-      </div> */}
-      {/* <div className="flex flex-col space-y-10">
-        <SubmissionList />
-        <UserSubmissionStatus />
-        <CreateSubmission />
-        <Leaderboard />
-      </div> */}
     </Container>
   );
 }

@@ -5,12 +5,6 @@ import {
   formatApiValidationErrors,
 } from "@/utils/form-validation";
 
-/**
- * A custom hook for handling form validation with Zod schemas
- * @param schema The Zod schema to validate against
- * @param initialValues Initial form values
- * @returns Form state, handlers, and validation methods
- */
 export function useZodForm<T extends Record<string, unknown>>(
   schema: ZodSchema,
   initialValues: T

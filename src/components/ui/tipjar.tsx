@@ -56,17 +56,6 @@ export function TipJar() {
                 ))}
               </AnimatePresence>
             </motion.div>
-            {/* {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute left-0 w-3 h-0.5 bg-[#555555]"
-                style={{ bottom: `${(i + 1) * 10}%` }}
-              >
-                <span className="absolute left-4 text-xs text-[#999999]">
-                  {(i + 1) * 10}
-                </span>
-              </div>
-            ))} */}
           </div>
         </div>
       </div>
