@@ -1,9 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html,
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+  background-color: #121313;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  position: relative;
 }
 
 @layer utilities {
@@ -40,6 +53,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -72,7 +86,111 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px 5px rgba(62, 207, 142, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 25px 10px rgba(62, 207, 142, 0.3);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Sequential ellipsis animation */
+@keyframes ellipsis1 {
+
+  0%,
+  20%,
+  100% {
+    opacity: 0;
+  }
+
+  30%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis2 {
+
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+
+  40%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis3 {
+
+  0%,
+  40%,
+  100% {
+    opacity: 0;
+  }
+
+  50%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis4 {
+
+  0%,
+  50%,
+  100% {
+    opacity: 0;
+  }
+
+  60%,
+  90% {
+    opacity: 1;
+  }
+}
+
+@keyframes ellipsis5 {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+
+  70%,
+  90% {
+    opacity: 1;
+  }
+}
+
+/* Add perspective to parent container */
+.perspective-1000 {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(62, 207, 142, 0.2);
 }

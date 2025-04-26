@@ -1,12 +1,12 @@
-import React, { FC } from "react";
-import { Progress } from "@/components/Progress";
+import { Container } from "@/components/common/Container";
+import Submission from "@/components/home/Submission";
 
-const Home: FC = () => {
+export default function HomePage() {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black">
-      <Progress />
-    </div>
+    <main className="flex-1 bg-[#121313] w-full flex justify-center">
+      <Container className="px-0">
+        <Submission />
+      </Container>
+    </main>
   );
-};
-
-export default Home;
+}

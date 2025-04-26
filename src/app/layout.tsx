@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Header } from "@/components/common/Header";
+import { Providers } from "@/providers";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -16,6 +18,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "tippit",
   description: "Tip comunnity work and projects.",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({
@@ -24,11 +27,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full bg-[#121313]">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#121313] text-foreground h-full flex flex-col`}
       >
-        {children}
+        <Providers>
+          <Header />
+          <div className="flex-1">{children}</div>
+        </Providers>
       </body>
     </html>
   );
