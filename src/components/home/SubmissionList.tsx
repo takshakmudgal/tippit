@@ -428,6 +428,7 @@ export default function SubmissionList() {
                             }
                             className="flex-grow"
                             color="success"
+                            aria-label="Select tip amount"
                           />
                           <span className="text-xs sm:text-sm">$50</span>
                         </div>
@@ -500,6 +501,7 @@ export default function SubmissionList() {
                 onPress={handlePrevCard}
                 className="rounded-full aspect-square min-w-8 h-8 bg-[#181919] border-[#3ecf8e33] text-[#3ecf8e] hover:bg-[#3ecf8e20] hover:scale-110 p-0 shadow-md transition-all duration-300"
                 disabled={loading || submissions.length <= 1}
+                aria-label="Previous card"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -522,6 +524,7 @@ export default function SubmissionList() {
                 onPress={handleNextCard}
                 className="rounded-full aspect-square min-w-8 h-8 bg-[#181919] border-[#3ecf8e33] text-[#3ecf8e] hover:bg-[#3ecf8e20] hover:scale-110 p-0 shadow-md transition-all duration-300"
                 disabled={loading || submissions.length <= 1}
+                aria-label="Next card"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
