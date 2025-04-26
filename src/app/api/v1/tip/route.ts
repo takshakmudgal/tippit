@@ -5,13 +5,9 @@ import { getSolPriceInUSD } from "@/utils/solana";
 import { createTipSchema, tipQuerySchema } from "@/schemas/tip";
 import {
   LAMPORTS_PER_SOL,
-  PublicKey,
   SystemProgram,
   MessageCompiledInstruction,
 } from "@solana/web3.js";
-
-// Define a tolerance for SOL amount comparison (e.g., 0.001 SOL)
-const SOL_AMOUNT_TOLERANCE = 0.001 * LAMPORTS_PER_SOL;
 
 export async function POST(request: NextRequest) {
   try {

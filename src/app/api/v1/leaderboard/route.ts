@@ -99,7 +99,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       leaderboard: processedSubmissions,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
