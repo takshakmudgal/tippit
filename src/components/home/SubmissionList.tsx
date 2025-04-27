@@ -409,7 +409,7 @@ export default function SubmissionList() {
                       </p>
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col p-2 sm:p-3 pt-0">
-                      <p className="text-white text-xs sm:text-lg leading-tight line-clamp-6 -mt-6 w-full pr-0">
+                      <p className="text-white text-sm sm:text-xs sm:text-lg leading-tight line-clamp-6 mt-2 sm:-mt-6 w-full pr-0">
                         {submission.description}
                       </p>
                       <div className="mt-auto">
